@@ -1,0 +1,33 @@
+.navbar {
+  position: relative;
+}
+
+.navbar-brand .navbar-item img {
+  max-height: 2.75rem;
+}
+
+.navbar-menu .navbar-start {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+}
+
+.navbar-start .navbar-item {
+  font-size: 1.1rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 3px solid transparent;
+}
+
+.navbar-start .navbar-item:hover {
+  background-color: transparent !important;
+  color: hsl(217, 71%, 53%) !important;
+  border-bottom-color: hsl(217, 71%, 53%);
+}
+
+.navbar-start .navbar-item.is-active {
+  background-color: transparent !important;
+  color: hsl(217, 71%, 53%) !important;
+  border-bottom-color: hsl(217, 71%, 53%);
+  font-weight: 600;
+}

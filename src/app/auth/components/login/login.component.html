@@ -1,0 +1,44 @@
+<section class="hero is-fullheight is-light is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-one-third">
+
+          <div class="box">
+            <figure class="image is-128x128 mx-auto mb-4">
+              <img src="assets/logo.png" alt="Logo de la Empresa">
+            </figure>
+
+            <h1 class="title has-text-centered">Iniciar Sesión</h1>
+
+            <form (ngSubmit)="login()">
+              <div class="field">
+                <label class="label">Correo Electrónico</label>
+                <div class="control">
+                  <input class="input" type="email" placeholder="ejemplo@correo.com" required>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">Contraseña</label>
+                <div class="control">
+                  <input class="input" type="password" placeholder="********" required>
+                </div>
+              </div>
+
+              <div class="field mt-5">
+                <div class="control">
+                  <button type="submit" class="button is-primary is-fullwidth">
+                    Ingresar
+                  </button>
+                </div>
+              </div>
+            </form>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

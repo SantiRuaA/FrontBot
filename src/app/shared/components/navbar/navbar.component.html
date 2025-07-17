@@ -1,0 +1,39 @@
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" routerLink="generador">
+      <img src="../assets/certibot.png" alt="certibot">
+    </a>
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarMenu" class="navbar-menu">
+    <div class="navbar-start">
+      <a routerLink="generador" class="navbar-item" routerLinkActive="is-active">
+        Generador
+      </a>
+      <a routerLink="documentos" class="navbar-item" routerLinkActive="is-active">
+        Documentos
+      </a>
+      <a routerLink="usuarios" class="navbar-item" routerLinkActive="is-active">
+        Usuarios
+      </a>
+      <a routerLink="ayuda" class="navbar-item" routerLinkActive="is-active">
+        Aviso
+      </a>
+    </div>
+
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
+          <a routerLink="login" class="button is-light">
+            Salir
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

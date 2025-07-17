@@ -19,12 +19,12 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+                "src/assets/favicon.ico",
+                "src/assets"
             ],
             "styles": [
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "node_modules/bulma/css/versions/bulma-no-dark-mode.css",
               "src/styles.css"
             ],
             "server": "src/main.server.ts",
@@ -81,12 +81,12 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+                "src/assets/favicon.ico",
+                "src/assets"
             ],
             "styles": [
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "node_modules/bulma/css/versions/bulma-no-dark-mode.css",
               "src/styles.css"
             ]
           }

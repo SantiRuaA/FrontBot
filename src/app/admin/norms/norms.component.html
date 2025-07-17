@@ -1,0 +1,138 @@
+<div class="container is-fullhd">
+  <form class="box p-5" >
+    <div class="level mb-4">
+      <div class="level-left">
+        <div class="level-item">
+          <h4 class="title is-4 mb-0"></h4>
+        </div>
+      </div>
+    </div>
+    <hr class="mt-0">
+
+    <div class="field">
+      <label class="label" for="codigoNorma">Código de Norma:</label>
+      <div class="control">
+        <input id="codigoNorma" class="input" formControlName="codigoNorma" type="text"
+          placeholder="Ingrese el código de la norma">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="normaCertificacion">Norma de Certificación:</label>
+      <div class="control">
+        <input id="normaCertificacion" class="input" formControlName="normaCertificacion" type="text"
+          placeholder="Ingrese la norma de certificación">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Criterios de Desempeño:</label>
+      <div formArrayName="criteriosDesempeno" class="box is-shadowless p-4 mb-4 has-background-light">
+        <div class="field is-grouped is-align-items-center mb-3">
+          <div class="control is-expanded">
+            <input class="input" type="text" placeholder="Agrega un criterio de desempeño">
+          </div>
+          <div class="control">
+            <button type="button" class="button is-danger is-outlined">
+              <span class="icon is-small">
+                <i class="fas fa-times"></i> </span>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+        <div class="control">
+          <button type="button" class="button is-success is-light is-fullwidth">
+            <span class="icon is-small">
+              <i class="fas fa-plus"></i> </span>
+            <span>Añadir Criterio</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Conocimientos Relacionados:</label>
+      <div formArrayName="conocimientodelItem" class="box is-shadowless p-4 has-background-light">
+        <div class="field is-grouped is-align-items-center mb-3">
+          <div class="control is-expanded">
+            <input class="input" type="text" placeholder="Agregar conocimiento relacionado">
+          </div>
+          <div class="control">
+            <button type="button" class="button is-danger is-outlined">
+              <span class="icon is-small">
+                <i class="fas fa-times"></i>
+              </span>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+        <div class="control">
+          <button type="button" class="button is-success is-light is-fullwidth">
+            <span class="icon is-small">
+              <i class="fas fa-plus"></i>
+            </span>
+            <span>Añadir Conocimiento</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field is-grouped is-grouped-right mt-5">
+      <div class="control">
+        <button type="submit" class="button is-primary is-medium">
+          <span class="icon">
+            <i class="fas fa-save"></i>
+          </span>
+          <span></span>
+        </button>
+      </div>
+      <div class="control">
+        <button type="button" class="button is-light is-medium">
+          <span class="icon">
+            <i class="fas fa-ban"></i>
+          </span>
+          <span>Cancelar</span>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <h3 class="title is-5 mt-6">Listado de Normas</h3>
+  <div class="content">
+    <div class="notification is-info is-light">
+        No hay normas registradas.
+    </div>
+    <ul>
+      <li>
+        <div class="level is-mobile">
+          <div class="level-left">
+            <div class="level-item">
+              <div>
+                <p class="title is-6 mb-1 has-text-grey-darker">
+                  <strong></strong>
+                </p>
+                <p class="subtitle is-7 has-text-grey">
+                
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="level-right">
+            <div class="level-item">
+              <div class="buttons">
+                <button type="button" class="button is-link is-small">
+                  <span class="icon is-small"><i class="fas fa-edit"></i></span>
+                  <span>Editar</span>
+                </button>
+                <button type="button" class="button is-danger is-small">
+                  <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
+                  <span>Eliminar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
