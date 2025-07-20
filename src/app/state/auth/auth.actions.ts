@@ -3,7 +3,7 @@ import { User } from '../../shared/models/user.model';
 export class Login {
   static readonly type = '[Auth] Login';
   constructor(
-    public correo_sena: string, // <-- CAMBIO: de username a correo_sena
+    public correo_sena: string, 
     public password: string
   ) {}
 }

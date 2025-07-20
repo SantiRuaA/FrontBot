@@ -7,7 +7,7 @@ import { Navigate } from '@ngxs/router-plugin';
 import { jwtDecode } from 'jwt-decode';
 
 import { AuthService } from '../../core/services/auth.service';
-import { User } from '../../shared/models/user.model'; // Ajusta la ruta si es necesario
+import { User } from '../../shared/models/user.model';
 import { Login, LoginSuccess, LoginFailure, Logout, RestoreSession } from './auth.actions';
 
 export interface AuthStateModel {

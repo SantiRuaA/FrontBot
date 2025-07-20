@@ -6,7 +6,6 @@ import { firstValueFrom } from 'rxjs';
 import { AuthState } from '../../state/auth/auth.state';
 import { RestoreSession } from '../../state/auth/auth.actions';
 
-// Variable para asegurar que la restauración solo se haga una vez por carga de la app
 let sessionRestored = false;
 
 export const authGuard: CanActivateFn = async (route, state) => {
@@ -15,14 +14,11 @@ export const authGuard: CanActivateFn = async (route, state) => {
   const platformId = inject(PLATFORM_ID);
   const isPublicRoute = route.data['isPublic'] === true;
 
-  // Si no hemos restaurado la sesión y estamos en el navegador...
   if (!sessionRestored && isPlatformBrowser(platformId)) {
-    // ...la restauramos y esperamos a que termine.
     await firstValueFrom(store.dispatch(new RestoreSession()));
-    sessionRestored = true; // Marcamos como restaurada para no volver a hacerlo.
+    sessionRestored = true; 
   }
 
-  // Ahora, con el estado ya actualizado, tomamos la decisión
   const isAuthenticated = store.selectSnapshot(AuthState.isAuthenticated);
 
   if (isPublicRoute) {

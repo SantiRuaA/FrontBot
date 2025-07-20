@@ -50,4 +50,10 @@ export class UserService {
             image: '../assets/logo.png'
         };
     }
+
+    createUser(userData: any): Observable<User> {
+    return this.http.post<UserApiResponse>(`${this.apiUrl}`, userData).pipe(
+      map(apiUser => this.mapApiToUser(apiUser))
+    );
+  }
 }

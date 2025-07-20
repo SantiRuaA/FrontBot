@@ -3,7 +3,12 @@
     <p class="subtitle is-6 has-text-centered mb-5">Por favor, completa los siguientes datos para registrar un nuevo usuario.</p>
     <hr>
 
-    <form>
+    <!-- Muestra un mensaje de error si existe -->
+    <div *ngIf="error$ | async as error" class="notification is-danger is-light mb-4">
+      {{ error }}
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
         <h3 class="title is-5">Información Personal</h3>
         <div class="columns is-multiline">
             <div class="column is-one-third">
@@ -11,8 +16,8 @@
                     <label class="label" for="tipo_de_identificacion">Tipo de Identificación</label>
                     <div class="control">
                         <div class="select is-fullwidth">
-                            <select id="tipo_de_identificacion">
-                                <option value="CC" selected>Cédula de Ciudadanía (CC)</option>
+                            <select id="tipo_de_identificacion" formControlName="tipo_de_identificacion">
+                                <option value="CC">Cédula de Ciudadanía (CC)</option>
                                 <option value="TI">Tarjeta de Identidad (TI)</option>
                                 <option value="CE">Cédula de Extranjería (CE)</option>
                                 <option value="PA">Pasaporte (PA)</option>
@@ -25,15 +30,16 @@
                 <div class="field">
                     <label class="label" for="numero_identificacion">Número de Identificación</label>
                     <div class="control">
-                        <input class="input" type="text" id="numero_identificacion" value="1028345678" placeholder="Ej: 1234567890" required>
+                        <input class="input" type="text" id="numero_identificacion" formControlName="numero_identificacion" placeholder="Ej: 1234567890">
                     </div>
                 </div>
             </div>
+            <!-- ... (repite formControlName para todos los inputs) ... -->
             <div class="column is-half">
                 <div class="field">
                     <label class="label" for="primer_nombre">Primer Nombre</label>
                     <div class="control">
-                        <input class="input" type="text" id="primer_nombre" value="Ana" placeholder="Primer Nombre" required>
+                        <input class="input" type="text" id="primer_nombre" formControlName="primer_nombre" placeholder="Primer Nombre">
                     </div>
                 </div>
             </div>
@@ -41,7 +47,7 @@
                 <div class="field">
                     <label class="label" for="segundo_nombre">Segundo Nombre</label>
                     <div class="control">
-                        <input class="input" type="text" id="segundo_nombre" value="María" placeholder="Segundo Nombre">
+                        <input class="input" type="text" id="segundo_nombre" formControlName="segundo_nombre" placeholder="Segundo Nombre">
                     </div>
                 </div>
             </div>
@@ -49,7 +55,7 @@
                 <div class="field">
                     <label class="label" for="primer_apellido">Primer Apellido</label>
                     <div class="control">
-                        <input class="input" type="text" id="primer_apellido" value="Gómez" placeholder="Primer Apellido" required>
+                        <input class="input" type="text" id="primer_apellido" formControlName="primer_apellido" placeholder="Primer Apellido">
                     </div>
                 </div>
             </div>
@@ -57,7 +63,7 @@
                 <div class="field">
                     <label class="label" for="segundo_apellido">Segundo Apellido</label>
                     <div class="control">
-                        <input class="input" type="text" id="segundo_apellido" value="Pérez" placeholder="Segundo Apellido">
+                        <input class="input" type="text" id="segundo_apellido" formControlName="segundo_apellido" placeholder="Segundo Apellido">
                     </div>
                 </div>
             </div>
@@ -65,7 +71,7 @@
                 <div class="field">
                     <label class="label" for="fecha_nacimiento">Fecha de Nacimiento</label>
                     <div class="control">
-                        <input class="input" type="date" id="fecha_nacimiento" value="1990-05-15" required>
+                        <input class="input" type="date" id="fecha_nacimiento" formControlName="fecha_nacimiento">
                     </div>
                 </div>
             </div>
@@ -74,67 +80,68 @@
         <hr>
         <h3 class="title is-5">Información de Contacto y Residencia</h3>
         <div class="columns is-multiline">
+            <!-- ... (repite formControlName para todos los inputs) ... -->
             <div class="column is-one-third">
                 <div class="field">
                     <label class="label" for="pais_residencia">País de Residencia</label>
                     <div class="control">
-                        <input class="input" type="text" id="pais_residencia" value="Colombia" placeholder="País" required>
+                        <input class="input" type="text" id="pais_residencia" formControlName="pais_residencia" placeholder="País">
                     </div>
                 </div>
             </div>
             <div class="column is-one-third">
                 <div class="field">
-                    <label class="label" for="dpto_residencia">Departamento de Residencia</label>
+                    <label class="label" for="dpto_residencia">Departamento</label>
                     <div class="control">
-                        <input class="input" type="text" id="dpto_residencia" value="Antioquia" placeholder="Departamento" required>
+                        <input class="input" type="text" id="dpto_residencia" formControlName="dpto_residencia" placeholder="Departamento">
                     </div>
                 </div>
             </div>
             <div class="column is-one-third">
                 <div class="field">
-                    <label class="label" for="mncpio_residencia">Municipio de Residencia</label>
+                    <label class="label" for="mncpio_residencia">Municipio</label>
                     <div class="control">
-                        <input class="input" type="text" id="mncpio_residencia" value="Medellín" placeholder="Municipio" required>
+                        <input class="input" type="text" id="mncpio_residencia" formControlName="mncpio_residencia" placeholder="Municipio">
                     </div>
                 </div>
             </div>
             <div class="column is-full">
                 <div class="field">
-                    <label class="label" for="direccion_residencia">Dirección de Residencia</label>
+                    <label class="label" for="direccion_residencia">Dirección</label>
                     <div class="control">
-                        <input class="input" type="text" id="direccion_residencia" value="Carrera 78 # 45-20, Apt 301" placeholder="Dirección" required>
+                        <input class="input" type="text" id="direccion_residencia" formControlName="direccion_residencia" placeholder="Dirección">
                     </div>
                 </div>
             </div>
             <div class="column is-half">
                 <div class="field">
-                    <label class="label" for="correo_sena">Correo Electrónico Sena</label>
+                    <label class="label" for="correo_sena">Correo Sena</label>
                     <div class="control">
-                        <input class="input" type="email" id="correo_sena" value="ana.gomez@example.com" placeholder="Correo institucional">
+                        <input class="input" type="email" id="correo_sena" formControlName="correo_sena" placeholder="Correo institucional">
                     </div>
                 </div>
             </div>
             <div class="column is-half">
                 <div class="field">
-                    <label class="label" for="correo_particular">Correo Electrónico Particular</label>
+                    <label class="label" for="correo_particular">Correo Particular</label>
                     <div class="control">
-                        <input class="input" type="email" id="correo_particular" value="ana.gomez@example.com" placeholder="Correo personal">
+                        <input class="input" type="email" id="correo_particular" formControlName="correo_particular" placeholder="Correo personal">
                     </div>
                 </div>
             </div>
-            <div class="column is-one-third">
+             <div class="column is-one-third">
                 <div class="field">
                     <label class="label" for="telefono_entidad">Teléfono Entidad</label>
                     <div class="control">
-                        <input class="input" type="tel" id="telefono_entidad" value="6041234567" placeholder="Teléfono de la entidad">
+                        <input class="input" type="tel" id="telefono_entidad" formControlName="telefono_entidad" placeholder="Teléfono de la entidad">
                     </div>
                 </div>
             </div>
             <div class="column is-one-third">
                 <div class="field">
-                    <label class="label" for="extension_telefonica">Extensión Telefónica</label>
+                    <label class="label" for="extension_telefonica">Extensión</label>
                     <div class="control">
-                        <input class="input" type="text" id="extension_telefonica" value="123" placeholder="Extensión">
+                        <input class="input" type="text" id="extension_telefonica" formControlName="extension_telefonica" placeholder="Extensión">
                     </div>
                 </div>
             </div>
@@ -142,7 +149,7 @@
                 <div class="field">
                     <label class="label" for="numero_celular">Número Celular</label>
                     <div class="control">
-                        <input class="input" type="tel" id="numero_celular" value="3001234567" placeholder="Número de celular" required>
+                        <input class="input" type="tel" id="numero_celular" formControlName="numero_celular" placeholder="Número de celular">
                     </div>
                 </div>
             </div>
@@ -156,9 +163,9 @@
                     <label class="label" for="estado_actual">Estado Actual</label>
                     <div class="control">
                         <div class="select is-fullwidth">
-                            <select id="estado_actual">
-                                <option value="true" selected>Activo</option>
-                                <option value="false">Inactivo</option>
+                            <select id="estado_actual" formControlName="estado_actual">
+                                <option [ngValue]="true">Activo</option>
+                                <option [ngValue]="false">Inactivo</option>
                             </select>
                         </div>
                     </div>
@@ -166,17 +173,17 @@
             </div>
             <div class="column is-half">
                 <div class="field">
-                    <label class="label" for="fecha_inicio_contrato">Fecha de Inicio de Contrato</label>
+                    <label class="label" for="fecha_inicio_contrato">Fecha de Inicio</label>
                     <div class="control">
-                        <input class="input" type="date" id="fecha_inicio_contrato" value="2024-01-01" required>
+                        <input class="input" type="date" id="fecha_inicio_contrato" formControlName="fecha_inicio_contrato">
                     </div>
                 </div>
             </div>
             <div class="column is-half">
                 <div class="field">
-                    <label class="label" for="fecha_fin_contrato">Fecha de Fin de Contrato</label>
+                    <label class="label" for="fecha_fin_contrato">Fecha de Fin</label>
                     <div class="control">
-                        <input class="input" type="date" id="fecha_fin_contrato" value="2025-12-31" required>
+                        <input class="input" type="date" id="fecha_fin_contrato" formControlName="fecha_fin_contrato">
                     </div>
                 </div>
             </div>
@@ -184,7 +191,7 @@
                 <div class="field">
                     <label class="label" for="numero_contrato">Número de Contrato</label>
                     <div class="control">
-                        <input class="input" type="text" id="numero_contrato" value="CONTRATO-2024-001" placeholder="Número de contrato">
+                        <input class="input" type="text" id="numero_contrato" formControlName="numero_contrato" placeholder="Número de contrato">
                     </div>
                 </div>
             </div>
@@ -195,20 +202,11 @@
         <div class="columns is-multiline">
             <div class="column is-full">
                 <div class="field">
-                    <label class="label" for="usuario_asignado">Usuario Asignado</label>
-                    <div class="control">
-                        <input class="input is-static" type="text" id="usuario_asignado" value="anamaria.gomez" readonly>
-                    </div>
-                    <p class="help">El usuario se genera automáticamente y no puede ser modificado.</p>
-                </div>
-            </div>
-            <div class="column is-full">
-                <div class="field">
                     <label class="label" for="rol_asigando">Rol Asignado</label>
                     <div class="control">
                         <div class="select is-fullwidth">
-                            <select id="rol_asigando">
-                                <option value="Instructor" selected>Dinamizador</option>
+                            <select id="rol_asigando" formControlName="rol_asigando">
+                                <option value="Instructor">Dinamizador</option>
                                 <option value="Admin">Administrador</option>
                                 <option value="Aprendiz">Evaluador</option>
                             </select>
@@ -218,9 +216,9 @@
             </div>
             <div class="column is-half">
                 <div class="field">
-                    <label class="label" for="contrasena">Contraseña</label>
+                    <label class="label" for="password">Contraseña</label>
                     <div class="control">
-                        <input class="input" type="password" id="contrasena" value="MiContrasenaSegura123!" placeholder="Mínimo 8 caracteres" required>
+                        <input class="input" type="password" id="password" formControlName="password" placeholder="Mínimo 8 caracteres">
                     </div>
                 </div>
             </div>
@@ -228,7 +226,7 @@
                 <div class="field">
                     <label class="label" for="confirmar_contrasena">Confirmar Contraseña</label>
                     <div class="control">
-                        <input class="input" type="password" id="confirmar_contrasena" value="MiContrasenaSegura123!" placeholder="Repite la contraseña" required>
+                        <input class="input" type="password" id="confirmar_contrasena" formControlName="confirmar_contrasena" placeholder="Repite la contraseña">
                     </div>
                 </div>
             </div>
@@ -236,7 +234,9 @@
 
         <div class="field is-grouped is-grouped-centered mt-6">
             <div class="control">
-                <button class="button is-primary is-large" type="submit">Guardar Usuario</button>
+                <button class="button is-primary is-large" type="submit" [disabled]="registerForm.invalid || (loading$ | async)" [ngClass]="{'is-loading': loading$ | async}">
+                    Guardar Usuario
+                </button>
             </div>
             <div class="control">
                 <button class="button is-light is-large" type="reset">Limpiar Campos</button>

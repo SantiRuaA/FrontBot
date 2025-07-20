@@ -10,7 +10,6 @@ import { NgxsRouterPluginModule } from '@ngxs/router-plugin';
 import { routes } from './app.routes';
 import { UserState } from './state/user/user.state';
 import { AuthState } from './state/auth/auth.state';
-import { authInitializer } from './core/initializers/auth.initializer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
