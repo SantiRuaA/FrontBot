@@ -3,40 +3,44 @@
     <div class="container">
       <div class="columns is-centered">
         <div class="column is-one-third">
-
           <div class="box">
             <figure class="image is-128x128 mx-auto mb-4">
-              <img src="assets/logo.png" alt="Logo de la Empresa">
+              <img src="assets/logo.png" alt="Logo empresa">
             </figure>
 
             <h1 class="title has-text-centered">Iniciar Sesión</h1>
 
-            <form (ngSubmit)="login()">
+            <div *ngIf="error$ | async as error" class="notification is-danger is-light">
+              {{ error }}
+            </div>
+
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
               <div class="field">
                 <label class="label">Correo Electrónico</label>
                 <div class="control">
-                  <input class="input" type="email" placeholder="ejemplo@correo.com" required>
+                  <input class="input" type="email" placeholder="ejemplo@sena.edu.co" formControlName="correo_sena">
                 </div>
               </div>
 
               <div class="field">
                 <label class="label">Contraseña</label>
                 <div class="control">
-                  <input class="input" type="password" placeholder="********" required>
+                  <input class="input" type="password" placeholder="********" formControlName="password">
                 </div>
               </div>
 
               <div class="field mt-5">
                 <div class="control">
-                  <button type="submit" class="button is-primary is-fullwidth">
+                  <button type="submit"
+                          class="button is-primary is-fullwidth"
+                          [ngClass]="{'is-loading': loading$ | async}"
+                          [disabled]="loginForm.invalid || (loading$ | async)">
                     Ingresar
                   </button>
                 </div>
               </div>
             </form>
-
           </div>
-
         </div>
       </div>
     </div>

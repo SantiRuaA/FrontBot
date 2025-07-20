@@ -52,7 +52,7 @@
                             <p class="has-text-grey-darker">{{ user.email }}</p>
                         </td>
                         <td>
-                            <span class="tag" [ngClass]="{'is-info': user.role === 'admin', 'is-light': user.role !== 'admin'}">
+                            <span class="tag" [ngClass]="{'is-info': user.role.toLowerCase() === 'administrador', 'is-light': user.role.toLowerCase() !== 'administrador'}">
                                 {{ user.role }}
                             </span>
                         </td>

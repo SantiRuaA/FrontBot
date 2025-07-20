@@ -12,7 +12,7 @@ interface UserApiResponse {
     segundo_apellido: string;
     dpto_residencia: string;
     correo_sena: string;
-    rol_asigando: string;
+    rol_asignado: string;
     estado_actual: boolean;
     [key: string]: any;
 }
@@ -44,7 +44,8 @@ export class UserService {
             fullName: fullName,
             department: apiUser.dpto_residencia,
             email: apiUser.correo_sena,
-            role: apiUser.rol_asigando,
+            role: apiUser.rol_asignado,
+            
             status: apiUser.estado_actual,
             image: '../assets/logo.png'
         };

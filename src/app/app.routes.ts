@@ -1,33 +1,28 @@
 import { Routes } from '@angular/router';
 
 import { MainLayoutComponent } from './shared/layouts/main-layout/main-layout.component';
-import { AuthLayoutComponent } from './shared/layouts/auth-layout/auth-layout.component';
+import { authGuard } from './core/guards/auth.guard'; 
 
 import { LoginComponent } from './auth/components/login/login.component';
 import { RegisterComponent } from './admin/register/register.component';
 import { UsersComponent } from './admin/user/users.component';
 import { NormsComponent } from './admin/norms/norms.component';
-import { GeneratorComponent } from './chatbot/generator/generator.coponent';
+import { GeneratorComponent } from './chatbot/generator/generator.component';
 import { HelpComponent } from './chatbot/help/help.component';
 import { DocumentsComponent } from './chatbot/documents/documents.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-
-  // --- Rutas Públicas (sin header) ---
   {
-    path: '',
-    component: AuthLayoutComponent,
-    children: [
-      { path: 'login', component: LoginComponent }
-      // Aquí podrías agregar /recuperar-password, etc.
-    ]
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [authGuard],
+    data: { isPublic: true }
   },
 
-  // --- Rutas Privadas (con header) ---
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [authGuard], 
     children: [
       { path: 'register', component: RegisterComponent },
       { path: 'generador', component: GeneratorComponent },
@@ -35,8 +30,10 @@ export const routes: Routes = [
       { path: 'documentos', component: DocumentsComponent },
       { path: 'usuarios', component: UsersComponent },
       { path: 'normas', component: NormsComponent },
-    ]
+
+      { path: '', redirectTo: 'generador', pathMatch: 'full' },
+    ],
   },
 
-  { path: '**', redirectTo: '/login' },
+  { path: '**', redirectTo: 'generador' },
 ];
