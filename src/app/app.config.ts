@@ -11,13 +11,14 @@ import { routes } from './app.routes';
 import { UserState } from './state/user/user.state';
 import { AuthState } from './state/auth/auth.state';
 import { NormState } from './state/norm/norm.state';
+import { authInterceptor } from './core/interceptors/auth.interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withInterceptors([]), withFetch()),
+    provideHttpClient(withInterceptors([authInterceptor]), withFetch()),
 
     importProvidersFrom(
       NgxsModule.forRoot(

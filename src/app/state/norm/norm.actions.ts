@@ -13,3 +13,18 @@ export class LoadNormsFailure {
   static readonly type = '[Norm] Load Norms Failure';
   constructor(public error: string) {}
 }
+
+export class CreateNorm {
+  static readonly type = '[Norm] Create Norm';
+  constructor(public payload: Partial<Norm>) {}
+}
+
+export class CreateNormSuccess {
+  static readonly type = '[Norm] Create Norm Success';
+  constructor(public norm: Norm) {}
+}
+
+export class CreateNormFailure {
+  static readonly type = '[Norm] Create Norm Failure';
+  constructor(public error: any) {}
+}

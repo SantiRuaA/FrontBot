@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { User } from '../../shared/models/user.model';
 
@@ -58,9 +58,12 @@ export class UserService {
     }
 
     createUser(userData: any): Observable<User> {
-      return this.http.post<any>(this.apiUrl, userData).pipe(
-        map(apiUser => this.mapApiToUser(apiUser))
-      );
+        const headers = new HttpHeaders({
+        'Content-Type': 'application/json'
+        });
+        return this.http.post<any>(this.apiUrl, userData, { headers: headers }).pipe(
+        map(createdApiUser => this.mapApiToUser(createdApiUser))
+        );
     }
 
     private mapApiToUser(apiUser: UserApiResponse): User {

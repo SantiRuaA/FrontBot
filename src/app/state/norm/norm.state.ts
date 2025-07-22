@@ -3,7 +3,7 @@ import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { tap, catchError, of } from 'rxjs';
 import { Norm } from '../../shared/models/norm.model';
 import { NormService } from '../../core/services/norm.service'; // Asegúrate que la ruta sea correcta
-import { LoadNorms, LoadNormsSuccess, LoadNormsFailure } from './norm.actions';
+import { LoadNorms, LoadNormsSuccess, LoadNormsFailure, CreateNorm, CreateNormSuccess, CreateNormFailure } from './norm.actions';
 
 export interface NormStateModel {
   norms: Norm[];
@@ -66,5 +66,28 @@ export class NormState {
       loading: false,
       error: error,
     });
+  }
+
+  @Action(CreateNorm)
+  createNorm(ctx: StateContext<NormStateModel>, { payload }: CreateNorm) {
+    ctx.patchState({ loading: true });
+    return this.normService.createNorm(payload).pipe(
+      tap(newNorm => ctx.dispatch(new CreateNormSuccess(newNorm))),
+      catchError(error => ctx.dispatch(new CreateNormFailure(error)))
+    );
+  }
+
+  @Action(CreateNormSuccess)
+  createNormSuccess(ctx: StateContext<NormStateModel>, { norm }: CreateNormSuccess) {
+    const state = ctx.getState();
+    ctx.patchState({
+      norms: [...state.norms, norm],
+      loading: false
+    });
+  }
+
+  @Action(CreateNormFailure)
+  createNormFailure(ctx: StateContext<NormStateModel>, { error }: CreateNormFailure) {
+    ctx.patchState({ error, loading: false });
   }
 }

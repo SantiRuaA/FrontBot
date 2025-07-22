@@ -1,5 +1,5 @@
 <div class="container is-fullhd">
-  <form class="box p-5" [formGroup]="normForm">
+  <form class="box p-5" [formGroup]="normForm" (ngSubmit)="onSubmit()">
     <div class="level mb-4">
       <div class="level-left">
         <div class="level-item">
@@ -28,22 +28,19 @@
     <div class="field">
       <label class="label">Criterios de Desempeño:</label>
       <div formArrayName="criteriosDesempeno" class="box is-shadowless p-4 mb-4 has-background-light">
-        <div class="field is-grouped is-align-items-center mb-3">
+        <div *ngFor="let criterio of criteriosDesempeno.controls; let i = index" class="field is-grouped is-align-items-center mb-3">
           <div class="control is-expanded">
-            <input class="input" type="text" placeholder="Agrega un criterio de desempeño">
+            <input [formControlName]="i" class="input" type="text" placeholder="Agrega un criterio de desempeño">
           </div>
           <div class="control">
-            <button type="button" class="button is-danger is-outlined">
-              <span class="icon is-small">
-                <i class="fas fa-times"></i> </span>
-              <span>Eliminar</span>
+            <button (click)="removeCriterio(i)" type="button" class="button is-danger is-outlined" [disabled]="criteriosDesempeno.length <= 1">
+              <span class="icon is-small"><i class="fas fa-times"></i></span>
             </button>
           </div>
         </div>
         <div class="control">
-          <button type="button" class="button is-success is-light is-fullwidth">
-            <span class="icon is-small">
-              <i class="fas fa-plus"></i> </span>
+          <button (click)="addCriterio()" type="button" class="button is-success is-light is-fullwidth">
+            <span class="icon is-small"><i class="fas fa-plus"></i></span>
             <span>Añadir Criterio</span>
           </button>
         </div>
@@ -53,24 +50,19 @@
     <div class="field">
       <label class="label">Conocimientos Relacionados:</label>
       <div formArrayName="conocimientodelItem" class="box is-shadowless p-4 has-background-light">
-        <div class="field is-grouped is-align-items-center mb-3">
+        <div *ngFor="let conocimiento of conocimientodelItem.controls; let i = index" class="field is-grouped is-align-items-center mb-3">
           <div class="control is-expanded">
-            <input class="input" type="text" placeholder="Agregar conocimiento relacionado">
+            <input [formControlName]="i" class="input" type="text" placeholder="Agregar conocimiento relacionado">
           </div>
           <div class="control">
-            <button type="button" class="button is-danger is-outlined">
-              <span class="icon is-small">
-                <i class="fas fa-times"></i>
-              </span>
-              <span>Eliminar</span>
+            <button (click)="removeConocimiento(i)" type="button" class="button is-danger is-outlined" [disabled]="conocimientodelItem.length <= 1">
+              <span class="icon is-small"><i class="fas fa-times"></i></span>
             </button>
           </div>
         </div>
         <div class="control">
-          <button type="button" class="button is-success is-light is-fullwidth">
-            <span class="icon is-small">
-              <i class="fas fa-plus"></i>
-            </span>
+          <button (click)="addConocimiento()" type="button" class="button is-success is-light is-fullwidth">
+            <span class="icon is-small"><i class="fas fa-plus"></i></span>
             <span>Añadir Conocimiento</span>
           </button>
         </div>
@@ -79,18 +71,14 @@
 
     <div class="field is-grouped is-grouped-right mt-5">
       <div class="control">
-        <button type="submit" class="button is-primary is-medium" disabled>
-          <span class="icon">
-            <i class="fas fa-save"></i>
-          </span>
+        <button type="submit" class="button is-primary is-medium" [disabled]="normForm.invalid || (loading$ | async)">
+          <span class="icon"><i class="fas fa-save"></i></span>
           <span>Guardar Norma</span>
         </button>
       </div>
       <div class="control">
-        <button type="button" class="button is-light is-medium">
-          <span class="icon">
-            <i class="fas fa-ban"></i>
-          </span>
+        <button type="button" class="button is-light is-medium" (click)="normForm.reset()">
+          <span class="icon"><i class="fas fa-ban"></i></span>
           <span>Cancelar</span>
         </button>
       </div>

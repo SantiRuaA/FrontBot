@@ -41,7 +41,8 @@ export class AuthState {
   @Selector() static user(state: AuthStateModel): User | null { return state.user; }
   @Selector() static loading(state: AuthStateModel): boolean { return state.loading; }
   @Selector() static error(state: AuthStateModel): string | null { return state.error; }
-  @Selector()static sessionRestored(state: AuthStateModel): boolean {return state.sessionRestored;}
+  @Selector() static sessionRestored(state: AuthStateModel): boolean {return state.sessionRestored;}
+  @Selector() static token(state: AuthStateModel): string | null { return state.token;}
 
   @Action(Login)
   login(ctx: StateContext<AuthStateModel>, { correo_sena, password }: Login) {

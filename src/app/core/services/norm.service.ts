@@ -18,4 +18,8 @@ export class NormService {
   getNormById(id: string): Observable<Norm> {
     return this.http.get<Norm>(`${this.apiUrl}/${id}`);
   }
+
+  createNorm(normData: Partial<Norm>): Observable<Norm> {
+    return this.http.post<Norm>(this.apiUrl, normData);
+  }
 }
