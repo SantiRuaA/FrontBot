@@ -1,0 +1,50 @@
+<div class="container is-fullhd">
+  <ng-container *ngIf="norm$ | async as norm; else loading">
+    <div class="box p-5">
+      <div class="level is-mobile mb-4">
+        <div class="level-left">
+          <div class="level-item">
+            <div>
+              <h1 class="title is-4">{{ norm.codigoNorma }}</h1>
+              <h2 class="subtitle is-6 has-text-grey">{{ norm.normaCertificacion }}</h2>
+            </div>
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <a routerLink="/normas" class="button is-light">
+              <span class="icon"><i class="fas fa-arrow-left"></i></span>
+              <span>Volver al listado</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <hr>
+
+      <div class="columns">
+        <div class="column">
+          <h3 class="title is-5">Criterios de Desempeño</h3>
+          <div class="content">
+            <ul>
+              <li *ngFor="let criterio of norm.criteriosDesempeno">{{ criterio }}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="column">
+          <h3 class="title is-5">Conocimientos Relacionados</h3>
+          <div class="content">
+            <ul>
+              <li *ngFor="let conocimiento of norm.conocimientodelItem">{{ conocimiento }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="has-text-centered p-6">
+      <button class="button is-loading is-ghost is-large">Cargando norma...</button>
+    </div>
+  </ng-template>
+</div>

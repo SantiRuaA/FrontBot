@@ -1,9 +1,9 @@
 <div class="container is-fullhd">
-  <form class="box p-5" >
+  <form class="box p-5" [formGroup]="normForm">
     <div class="level mb-4">
       <div class="level-left">
         <div class="level-item">
-          <h4 class="title is-4 mb-0"></h4>
+          <h4 class="title is-4 mb-0">Gestión de Normas</h4>
         </div>
       </div>
     </div>
@@ -79,11 +79,11 @@
 
     <div class="field is-grouped is-grouped-right mt-5">
       <div class="control">
-        <button type="submit" class="button is-primary is-medium">
+        <button type="submit" class="button is-primary is-medium" disabled>
           <span class="icon">
             <i class="fas fa-save"></i>
           </span>
-          <span></span>
+          <span>Guardar Norma</span>
         </button>
       </div>
       <div class="control">
@@ -99,40 +99,50 @@
 
   <h3 class="title is-5 mt-6">Listado de Normas</h3>
   <div class="content">
-    <div class="notification is-info is-light">
+    <ng-container *ngIf="norms$ | async as norms; else loading">
+      
+      <div *ngIf="norms.length === 0" class="notification is-info is-light">
         No hay normas registradas.
-    </div>
-    <ul>
-      <li>
-        <div class="level is-mobile">
-          <div class="level-left">
-            <div class="level-item">
-              <div>
-                <p class="title is-6 mb-1 has-text-grey-darker">
-                  <strong></strong>
-                </p>
-                <p class="subtitle is-7 has-text-grey">
-                
-                </p>
+      </div>
+
+      <ul *ngIf="norms.length > 0">
+        <li *ngFor="let norm of norms" class="box mb-3">
+          <div class="level is-mobile">
+            <div class="level-left">
+              <div class="level-item">
+                <div>
+                  <p class="title is-6 mb-1 has-text-grey-darker">
+                    <strong>{{ norm.codigoNorma }}</strong>
+                  </p>
+                  <p class="subtitle is-7 has-text-grey">
+                    {{ norm.normaCertificacion }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="level-right">
+              <div class="level-item">
+                <div class="buttons">
+                  <button [routerLink]="['/normas', norm._id]" type="button" class="button is-link is-small">
+                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                    <span>Ver / Editar</span>
+                  </button>
+                  <button type="button" class="button is-danger is-small">
+                    <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
+                    <span>Eliminar</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-          <div class="level-right">
-            <div class="level-item">
-              <div class="buttons">
-                <button type="button" class="button is-link is-small">
-                  <span class="icon is-small"><i class="fas fa-edit"></i></span>
-                  <span>Editar</span>
-                </button>
-                <button type="button" class="button is-danger is-small">
-                  <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
-                  <span>Eliminar</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </ng-container>
+
+    <ng-template #loading>
+      <div *ngIf="loading$ | async" class="has-text-centered">
+        <button class="button is-loading is-ghost">Cargando normas...</button>
+      </div>
+    </ng-template>
   </div>
 </div>

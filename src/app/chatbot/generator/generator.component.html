@@ -1,7 +1,7 @@
 <div class="column is-full"><app-headerGenerator/></div>
 <div class="columns is-fullhd box">
   <div class="column is-half">
-    <form class="box">
+    <form class="box" [formGroup]="generatorForm" (ngSubmit)="onSubmit()">
       <div class="columns is-multiline">
         <div class="column is-full">
           <div class="field">
@@ -17,7 +17,13 @@
             <label class="label" for="norma">Norma:</label>
             <div class="control">
               <div class="select is-fullwidth">
-                </div>
+                <select id="norma" formControlName="norma">
+                  <option [ngValue]="null" disabled>Seleccione una norma...</option>
+                  <option *ngFor="let norm of norms$ | async" [value]="norm._id">
+                    {{ norm.codigoNorma }} - {{ norm.normaCertificacion | slice:0:30 }}...
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -27,7 +33,13 @@
             <label class="label" for="categoria">Categoría:</label>
             <div class="control">
               <div class="select is-fullwidth">
-                </div>
+                <select id="categoria" formControlName="categoria">
+                  <option [ngValue]="null" disabled>Seleccione una categoría...</option>
+                  <option *ngFor="let categoria of categorias" [value]="categoria">
+                    {{ categoria }}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -37,7 +49,13 @@
             <label class="label" for="criterioDesempeno">Criterio de Desempeño:</label>
             <div class="control">
               <div class="select is-fullwidth">
-                </div>
+                <select id="criterioDesempeno" formControlName="criterioDesempeno">
+                  <option [ngValue]="null" disabled>Seleccione un criterio...</option>
+                  <option *ngFor="let criterio of performanceCriteria$ | async" [value]="criterio">
+                    {{ criterio | slice:0:50 }}...
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -47,7 +65,13 @@
             <label class="label" for="conocimiento">Conocimiento:</label>
             <div class="control">
               <div class="select is-fullwidth">
-                </div>
+                <select id="conocimiento" formControlName="conocimiento">
+                  <option [ngValue]="null" disabled>Seleccione un conocimiento...</option>
+                  <option *ngFor="let conocimiento of knowledgeItems$ | async" [value]="conocimiento">
+                    {{ conocimiento | slice:0:50 }}...
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -75,7 +99,13 @@
             <label class="label" for="generar">Generar:</label>
             <div class="control">
               <div class="select is-fullwidth">
-                </div>
+                <select id="generar" formControlName="generar">
+                  <option [ngValue]="null" disabled>Seleccione una opción...</option>
+                  <option *ngFor="let opcion of opcionesGenerar" [value]="opcion">
+                    {{ opcion }}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -85,7 +115,13 @@
             <label class="label" for="formato">Formato:</label>
             <div class="control">
               <div class="select is-fullwidth">
-                </div>
+                <select id="formato" formControlName="formato">
+                  <option [ngValue]="null" disabled>Seleccione un formato...</option>
+                  <option *ngFor="let formato of formatos" [value]="formato">
+                    {{ formato }}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -95,7 +131,13 @@
             <label class="label" for="limite">Límite:</label>
             <div class="control">
               <div class="select is-fullwidth">
-                </div>
+                <select id="limite" formControlName="limite">
+                  <option [ngValue]="null" disabled>Seleccione un límite...</option>
+                  <option *ngFor="let limite of limites" [value]="limite">
+                    {{ limite }}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -103,7 +145,7 @@
         <div class="column is-full">
           <div class="field">
             <div class="control">
-              <button type="submit" class="button is-primary is-fullwidth" [disabled]="">Generar</button>
+              <button type="submit" class="button is-primary is-fullwidth" [disabled]="generatorForm.invalid">Generar</button>
             </div>
           </div>
         </div>

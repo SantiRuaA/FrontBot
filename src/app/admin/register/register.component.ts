@@ -24,7 +24,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
-      tipo_de_identificacion: ['CC', Validators.required],
+      tipo_de_identificacion: ['C.C.', Validators.required],
       numero_identificacion: ['', Validators.required],
       primer_nombre: ['', Validators.required],
       segundo_nombre: [''],
@@ -44,7 +44,7 @@ export class RegisterComponent implements OnInit {
       fecha_inicio_contrato: ['', Validators.required],
       fecha_fin_contrato: ['', Validators.required],
       numero_contrato: [''],
-      rol_asigando: ['Instructor', Validators.required],
+      rol_asignado: ['Dinamizador', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmar_contrasena: ['', Validators.required]
     });
@@ -58,12 +58,30 @@ export class RegisterComponent implements OnInit {
     
     const formValue = this.registerForm.value;
     const payload = {
-      ...formValue,
-      tenantId: parseInt(formValue.numero_identificacion, 10), 
-      usuario_asignado: `${formValue.primer_nombre.toLowerCase()}.${formValue.primer_apellido.toLowerCase()}`
+      tenantId: parseInt(formValue.numero_identificacion, 10),
+      tipo_de_identificacion: formValue.tipo_de_identificacion,
+      primer_nombre: formValue.primer_nombre,
+      segundo_nombre: formValue.segundo_nombre,
+      primer_apellido: formValue.primer_apellido,
+      segundo_apellido: formValue.segundo_apellido,
+      fecha_nacimiento: formValue.fecha_nacimiento,
+      pais_residencia: formValue.pais_residencia,
+      dpto_residencia: formValue.dpto_residencia,
+      mncpio_residencia: formValue.mncpio_residencia,
+      direccion_residencia: formValue.direccion_residencia,
+      correo_sena: formValue.correo_sena,
+      correo_particular: formValue.correo_particular,
+      telefono_entidad: formValue.telefono_entidad,
+      extension_telefonica: formValue.extension_telefonica,
+      numero_celular: formValue.numero_celular,
+      estado_actual: formValue.estado_actual,
+      fecha_inicio_contrato: formValue.fecha_inicio_contrato,
+      fecha_fin_contrato: formValue.fecha_fin_contrato,
+      numero_contrato: formValue.numero_contrato,
+      usuario_asignado: `${formValue.primer_nombre.toLowerCase()}.${formValue.primer_apellido.toLowerCase()}`,
+      rol_asignado: formValue.rol_asignado,
+      password: formValue.password
     };
-
-    delete payload.confirmar_contrasena;
 
     this.store.dispatch(new CreateUser(payload));
   }

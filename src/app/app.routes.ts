@@ -7,6 +7,7 @@ import { LoginComponent } from './auth/components/login/login.component';
 import { RegisterComponent } from './admin/register/register.component';
 import { UsersComponent } from './admin/user/users.component';
 import { NormsComponent } from './admin/norms/norms.component';
+import { NormsDetailComponent } from './admin/norms-detail/norms-detail.component';
 import { GeneratorComponent } from './chatbot/generator/generator.component';
 import { HelpComponent } from './chatbot/help/help.component';
 import { DocumentsComponent } from './chatbot/documents/documents.component';
@@ -27,9 +28,10 @@ export const routes: Routes = [
       { path: 'register', component: RegisterComponent },
       { path: 'generador', component: GeneratorComponent },
       { path: 'ayuda', component: HelpComponent },
-      { path: 'documentos', component: DocumentsComponent },
+      { path: 'items', component: DocumentsComponent },
       { path: 'usuarios', component: UsersComponent },
       { path: 'normas', component: NormsComponent },
+      { path: 'normas/:id', component: NormsDetailComponent},
 
       { path: '', redirectTo: 'generador', pathMatch: 'full' },
     ],

@@ -4,8 +4,8 @@ import { User } from '../../shared/models/user.model';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { UserState } from '../../state/user/user.state'; // El estado que acabamos de modificar
-import { LoadUsers } from '../../state/user/user.actions'; // La acción que acabamos de modificar
+import { UserState } from '../../state/user/user.state';
+import { LoadUsers } from '../../state/user/user.actions'; 
 
 @Component({
   selector: 'app-user',

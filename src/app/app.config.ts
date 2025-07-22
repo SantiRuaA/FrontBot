@@ -10,6 +10,7 @@ import { NgxsRouterPluginModule } from '@ngxs/router-plugin';
 import { routes } from './app.routes';
 import { UserState } from './state/user/user.state';
 import { AuthState } from './state/auth/auth.state';
+import { NormState } from './state/norm/norm.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,7 +21,7 @@ export const appConfig: ApplicationConfig = {
 
     importProvidersFrom(
       NgxsModule.forRoot(
-        [UserState, AuthState],
+        [UserState, AuthState, NormState],
         { developmentMode: isDevMode() }
       ),
       NgxsRouterPluginModule.forRoot(),

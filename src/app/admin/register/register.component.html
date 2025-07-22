@@ -3,7 +3,6 @@
     <p class="subtitle is-6 has-text-centered mb-5">Por favor, completa los siguientes datos para registrar un nuevo usuario.</p>
     <hr>
 
-    <!-- Muestra un mensaje de error si existe -->
     <div *ngIf="error$ | async as error" class="notification is-danger is-light mb-4">
       {{ error }}
     </div>
@@ -34,7 +33,6 @@
                     </div>
                 </div>
             </div>
-            <!-- ... (repite formControlName para todos los inputs) ... -->
             <div class="column is-half">
                 <div class="field">
                     <label class="label" for="primer_nombre">Primer Nombre</label>
@@ -80,7 +78,6 @@
         <hr>
         <h3 class="title is-5">Información de Contacto y Residencia</h3>
         <div class="columns is-multiline">
-            <!-- ... (repite formControlName para todos los inputs) ... -->
             <div class="column is-one-third">
                 <div class="field">
                     <label class="label" for="pais_residencia">País de Residencia</label>
@@ -202,10 +199,10 @@
         <div class="columns is-multiline">
             <div class="column is-full">
                 <div class="field">
-                    <label class="label" for="rol_asigando">Rol Asignado</label>
+                    <label class="label" for="rol_asignado">Rol Asignado</label>
                     <div class="control">
                         <div class="select is-fullwidth">
-                            <select id="rol_asigando" formControlName="rol_asigando">
+                            <select id="rol_asignado" formControlName="rol_asignado">
                                 <option value="Instructor">Dinamizador</option>
                                 <option value="Admin">Administrador</option>
                                 <option value="Aprendiz">Evaluador</option>
