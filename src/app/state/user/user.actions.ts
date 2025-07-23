@@ -28,3 +28,18 @@ export class CreateUserFailure {
   static readonly type = '[User] Create User Failure';
   constructor(public error: string) {}
 }
+
+export class UpdateUser {
+  static readonly type = '[User] Update User';
+  constructor(public id: string, public payload: any) {}
+}
+
+export class UpdateUserSuccess {
+  static readonly type = '[User] Update User Success';
+  constructor(public user: User) {}
+}
+
+export class UpdateUserFailure {
+  static readonly type = '[User] Update User Failure';
+  constructor(public error: string) {}
+}

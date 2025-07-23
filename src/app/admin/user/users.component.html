@@ -62,8 +62,8 @@
                             </span>
                         </td>
                         <td class="has-text-right">
-                            <a routerLink="/users/{{user.id}}" class="button is-text is-small has-text-info mr-2">Ver</a>
-                            <a routerLink="/users/{{user.id}}/edit" class="button is-text is-small has-text-info">Editar</a>
+                            <a [routerLink]="['/usuarios', user.id]" class="button is-text is-small has-text-info mr-2">Ver</a>
+                            <a [routerLink]="['/usuarios', user.id, 'edit']" class="button is-text is-small has-text-info">Editar</a>
                         </td>
                     </tr>
                 </tbody>

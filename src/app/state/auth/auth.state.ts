@@ -53,6 +53,7 @@ export class AuthState {
         const decodedToken: any = jwtDecode(token);
         const userForState: User = {
           id: decodedToken.sub || decodedToken.id,
+          tenantId: decodedToken.tenantId,
           email: decodedToken.email,
           role: decodedToken.role,
           fullName: decodedToken.name || 'Usuario',
@@ -110,6 +111,7 @@ export class AuthState {
           if (Date.now() < decodedToken.exp * 1000) {
             const userForState: User = {
               id: decodedToken.sub || decodedToken.id,
+              tenantId: decodedToken.tenantId,
               email: decodedToken.email,
               role: decodedToken.role,
               fullName: decodedToken.name || 'Usuario',

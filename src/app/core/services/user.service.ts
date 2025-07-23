@@ -6,14 +6,27 @@ import { User } from '../../shared/models/user.model';
 // Interfaz para la respuesta de la lista de usuarios
 interface UserApiResponse {
     _id: string;
+    tenantId: number;
+    tipo_de_identificacion: string;
     primer_nombre: string;
     segundo_nombre: string;
     primer_apellido: string;
     segundo_apellido: string;
+    fecha_nacimiento: string;
+    pais_residencia: string;
     dpto_residencia: string;
+    mncpio_residencia: string;
+    direccion_residencia: string;
     correo_sena: string;
-    rol_asignado: string;
+    correo_particular: string;
+    telefono_entidad: string;
+    extension_telefonica: string;
+    numero_celular: string;
     estado_actual: boolean;
+    fecha_inicio_contrato: string;
+    fecha_fin_contrato: string;
+    numero_contrato: string;
+    rol_asignado: string;
     [key: string]: any;
 }
 
@@ -66,7 +79,17 @@ export class UserService {
         );
     }
 
-    private mapApiToUser(apiUser: UserApiResponse): User {
+    getUserById(id: string): Observable<UserApiResponse> {
+      return this.http.get<UserApiResponse>(`${this.apiUrl}/${id}`);
+    }
+
+    updateUser(id: string, userData: any): Observable<User> {
+        return this.http.put<UserApiResponse>(`${this.apiUrl}/${id}`, userData).pipe(
+        map(apiUser => this.mapApiToUser(apiUser))
+        );
+    }
+
+    public mapApiToUser(apiUser: UserApiResponse): User {
         const fullName = [
             apiUser.primer_nombre,
             apiUser.segundo_nombre,
@@ -76,6 +99,7 @@ export class UserService {
 
         return {
             id: apiUser._id,
+            tenantId: apiUser['tenantId'],
             fullName: fullName,
             department: apiUser.dpto_residencia,
             email: apiUser.correo_sena,

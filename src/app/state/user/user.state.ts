@@ -11,6 +11,9 @@ import {
   CreateUser,
   CreateUserSuccess,
   CreateUserFailure,
+  UpdateUser,
+  UpdateUserSuccess,
+  UpdateUserFailure,
 } from './user.actions';
 
 export interface UserStateModel {
@@ -104,6 +107,42 @@ export class UserState {
 
   @Action(CreateUserFailure)
   createUserFailure(ctx: StateContext<UserStateModel>, { error }: CreateUserFailure) {
+    ctx.patchState({
+      loading: false,
+      error: error,
+    });
+  }
+
+  @Action(UpdateUser)
+  updateUser(ctx: StateContext<UserStateModel>, { id, payload }: UpdateUser) {
+    ctx.patchState({ loading: true, error: null });
+    return this.userService.updateUser(id, payload).pipe(
+      tap((updatedUser) => {
+        ctx.dispatch(new UpdateUserSuccess(updatedUser));
+      }),
+      catchError((error) => {
+        const errorMessage = error.error?.message || 'Error al actualizar el usuario.';
+        ctx.dispatch(new UpdateUserFailure(errorMessage));
+        return of(error);
+      })
+    );
+  }
+
+  @Action(UpdateUserSuccess)
+  updateUserSuccess(ctx: StateContext<UserStateModel>, { user }: UpdateUserSuccess) {
+    const state = ctx.getState();
+    const updatedUsers = state.users.map(u => u.id === user.id ? user : u);
+    
+    ctx.patchState({
+      users: updatedUsers,
+      loading: false,
+      error: null,
+    });
+    return ctx.dispatch(new Navigate(['/usuarios']));
+  }
+
+  @Action(UpdateUserFailure)
+  updateUserFailure(ctx: StateContext<UserStateModel>, { error }: UpdateUserFailure) {
     ctx.patchState({
       loading: false,
       error: error,

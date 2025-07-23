@@ -1,0 +1,59 @@
+<div class="container box" *ngIf="user$ | async as user; else loading">
+  <div class="level is-mobile">
+    <div class="level-left">
+      <div class="level-item">
+        <h1 class="title">Detalle de Usuario</h1>
+      </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+        <a routerLink="/usuarios" class="button is-light">
+          <span class="icon"><i class="fas fa-arrow-left"></i></span>
+          <span>Volver al listado</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="columns">
+    <div class="column is-one-third has-text-centered">
+      <figure class="image is-128x128 is-inline-block">
+        <img class="is-rounded" [src]="user.image" [alt]="user.fullName">
+      </figure>
+      <h2 class="title is-4 mt-4">{{ user.fullName }}</h2>
+      <p class="subtitle is-6">{{ user.email }}</p>
+      <span class="tag" [ngClass]="{'is-success': user.status, 'is-danger': !user.status}">
+        {{ user.status ? 'Activo' : 'Inactivo' }}
+      </span>
+    </div>
+    <div class="column">
+      <h3 class="title is-5">Información Adicional</h3>
+      <table class="table is-fullwidth is-striped">
+        <tbody>
+          <tr>
+            <th>Documento:</th>
+            <td>{{ user.tenantId }}</td>
+          </tr>
+          <tr>
+            <th>Rol:</th>
+            <td>{{ user.role }}</td>
+          </tr>
+          <tr>
+            <th>Departamento:</th>
+            <td>{{ user.department }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <a [routerLink]="['/usuarios', user.id, 'edit']" class="button is-link">
+        <span class="icon"><i class="fas fa-edit"></i></span>
+        <span>Editar Usuario</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="has-text-centered p-6">
+    <button class="button is-loading is-ghost is-large">Cargando usuario...</button>
+  </div>
+</ng-template>

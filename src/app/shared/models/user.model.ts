@@ -6,4 +6,5 @@ export interface User {
     role: string;
     status: boolean;
     image: string;
+    tenantId: number;
 }
