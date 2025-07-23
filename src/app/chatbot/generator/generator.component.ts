@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, SlicePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Observable, map, startWith, tap } from 'rxjs';
+import { Observable, map, startWith, withLatestFrom, shareReplay } from 'rxjs';
 import { Norm } from '../../shared/models/norm.model';
 import { NormService } from '../../core/services/norm.service';
 import { ItemsComponent } from '../items/items.component';
@@ -10,7 +10,7 @@ import { headerGeneratorComponent } from '../header-generator/header-generator.c
 @Component({
   selector: 'app-generator',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, headerGeneratorComponent, ItemsComponent],
+  imports: [CommonModule, ReactiveFormsModule, headerGeneratorComponent, ItemsComponent, SlicePipe],
   templateUrl: './generator.component.html',
 })
 export class GeneratorComponent implements OnInit {
@@ -21,10 +21,15 @@ export class GeneratorComponent implements OnInit {
   performanceCriteria$!: Observable<string[]>;
   knowledgeItems$!: Observable<string[]>;
 
-  categorias: string[] = ['Categoría de Ejemplo 1', 'Categoría de Ejemplo 2', 'Categoría de Ejemplo 3'];
-  opcionesGenerar: string[] = ['Opción 1', 'Opción 2', 'Opción 3'];
-  formatos: string[] = ['Formato A', 'Formato B', 'Formato C'];
-  limites: number[] = [1, 2, 3];
+  categorias: string[] = ['Recordar', 'Comprender', 'Aplicar'];
+  opcionesGenerar: string[] = ['1', '2'];
+  formatos = [
+    '(selección multiple) varias preguntas con una única respuesta',
+    '(completar espacios vacios) varias preguntas con espacios vacios',
+    '(verdadero o falso) varias preguntas converdadero o falso',
+    '(union de respuestas) varias preguntas y varias respuestas para unir los items',
+  ];
+  limites = ['50 palabras', '100 palabras', '200 palabras'];
 
   constructor(
     private fb: FormBuilder,
@@ -45,26 +50,31 @@ export class GeneratorComponent implements OnInit {
       limite: [null]
     });
 
-    this.norms$ = this.normService.getNorms();
+    // 1. Cargamos las normas y usamos shareReplay(1) para evitar múltiples llamadas a la API
+    this.norms$ = this.normService.getNorms().pipe(
+      shareReplay(1)
+    );
 
-    this.performanceCriteria$ = this.generatorForm.get('norma')!.valueChanges.pipe(
-      startWith(null),
-      map(selectedNormId => {
-        let selectedNorm: Norm | undefined;
-        this.norms$.subscribe(norms => {
-          selectedNorm = norms.find(n => n._id === selectedNormId);
-        });
+    // Obtenemos el observable de cambios del control 'norma'
+    const normaChanges$ = this.generatorForm.get('norma')!.valueChanges.pipe(
+      startWith(null)
+    );
+
+    // 2. Usamos withLatestFrom para combinar el cambio con la lista completa de normas
+    this.performanceCriteria$ = normaChanges$.pipe(
+      withLatestFrom(this.norms$),
+      map(([selectedNormId, norms]) => {
+        if (!selectedNormId) return [];
+        const selectedNorm = norms.find(n => n._id === selectedNormId);
         return selectedNorm ? selectedNorm.criteriosDesempeno : [];
       })
     );
 
-    this.knowledgeItems$ = this.generatorForm.get('norma')!.valueChanges.pipe(
-      startWith(null),
-      map(selectedNormId => {
-        let selectedNorm: Norm | undefined;
-        this.norms$.subscribe(norms => {
-          selectedNorm = norms.find(n => n._id === selectedNormId);
-        });
+    this.knowledgeItems$ = normaChanges$.pipe(
+      withLatestFrom(this.norms$),
+      map(([selectedNormId, norms]) => {
+        if (!selectedNormId) return [];
+        const selectedNorm = norms.find(n => n._id === selectedNormId);
         return selectedNorm ? selectedNorm.conocimientodelItem : [];
       })
     );
