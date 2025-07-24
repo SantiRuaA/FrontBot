@@ -22,4 +22,8 @@ export class NormService {
   createNorm(normData: Partial<Norm>): Observable<Norm> {
     return this.http.post<Norm>(this.apiUrl, normData);
   }
+
+  updateNorm(id: string, normData: Partial<Norm>): Observable<Norm> {
+    return this.http.put<Norm>(`${this.apiUrl}/${id}`, normData);
+  }
 }

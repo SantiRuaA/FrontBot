@@ -18,7 +18,7 @@
       <a routerLink="/items" class="navbar-item" routerLinkActive="is-active">
         Items
       </a>
-      <a routerLink="/usuarios" class="navbar-item" routerLinkActive="is-active">
+      <a *ngIf="isAdmin$ | async" routerLink="/usuarios" class="navbar-item" routerLinkActive="is-active">
         Usuarios
       </a>
       <a routerLink="/ayuda" class="navbar-item" routerLinkActive="is-active">

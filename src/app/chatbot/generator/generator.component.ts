@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, map, startWith, withLatestFrom, shareReplay, take } from 'rxjs'; 
+import { Observable, map, startWith, withLatestFrom, shareReplay, take } from 'rxjs';
 import { Norm } from '../../shared/models/norm.model';
 import { NormService } from '../../core/services/norm.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ItemsComponent, Item } from '../items/items.component';
-import { headerGeneratorComponent } from '../header-generator/header-generator.component'; 
+import { headerGeneratorComponent } from '../header-generator/header-generator.component';
 
 @Component({
   selector: 'app-generator',
@@ -33,7 +33,7 @@ export class GeneratorComponent implements OnInit {
   limites = ['50 palabras', '100 palabras', '200 palabras'];
   
   generatedItems: Item[] = [];
-  isLoadingResponse = false;
+  isLoadingResponse = false; 
 
   constructor(
     private fb: FormBuilder,
@@ -55,9 +55,13 @@ export class GeneratorComponent implements OnInit {
       limite: [null, Validators.required]
     });
 
-    this.norms$ = this.normService.getNorms().pipe(shareReplay(1));
+    this.norms$ = this.normService.getNorms().pipe(
+      shareReplay(1)
+    );
 
-    const normaChanges$ = this.generatorForm.get('norma')!.valueChanges.pipe(startWith(this.generatorForm.get('norma')?.value));
+    const normaChanges$ = this.generatorForm.get('norma')!.valueChanges.pipe(
+      startWith(null)
+    );
 
     this.performanceCriteria$ = normaChanges$.pipe(
       withLatestFrom(this.norms$),
@@ -88,13 +92,15 @@ export class GeneratorComponent implements OnInit {
     const formValue = this.generatorForm.value;
 
     this.norms$.pipe(
-      take(1)
+      take(1) 
     ).subscribe(norms => {
       const selectedNorm = norms.find(n => n._id === formValue.norma);
       const normaNombre = selectedNorm ? selectedNorm.normaCertificacion : '';
 
       const prompt = `Necesito por favor que generes ${formValue.generar} pregunta(s), con el formato de pregunta estilo: ${formValue.formato}, utilizando esta información a continuación; norma: ${normaNombre}, con este criterio: ${formValue.criterioDesempeno}, tipo de conocimiento: ${formValue.conocimiento}, usando este contexto: ${formValue.contexto}, en este reactivo: ${formValue.reactivo}, limitando el texto de la pregunta a solo: ${formValue.limite}, con su respectiva respuesta correcta. Responde solo lo que te pido, no necesito ninguna otra información. Gracias.`;
       
+      console.log('Enviando Prompt:', prompt);
+
       this.chatService.generateResponse(prompt).subscribe({
         next: (response) => {
           const newItem: Item = {

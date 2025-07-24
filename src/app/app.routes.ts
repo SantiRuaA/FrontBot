@@ -14,6 +14,8 @@ import { GeneratorComponent } from './chatbot/generator/generator.component';
 import { HelpComponent } from './chatbot/help/help.component';
 import { DocumentsComponent } from './chatbot/documents/documents.component';
 import { loginGuard } from './core/guards/login.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { NormEditComponent } from './admin/norms-edit/norm-edit.component';
 
 export const routes: Routes = [
   {
@@ -28,15 +30,27 @@ export const routes: Routes = [
     canActivate: [authGuard], 
     canActivateChild: [authGuard],
     children: [
-      { path: 'register', component: RegisterComponent },
+      
       { path: 'generador', component: GeneratorComponent },
       { path: 'ayuda', component: HelpComponent },
       { path: 'items', component: DocumentsComponent },
-      { path: 'usuarios', component: UsersComponent },
-      { path: 'usuarios/:id', component: UserDetailComponent },
-      { path: 'usuarios/:id/edit', component: UserEditComponent },
+
+      { 
+        path: 'usuarios', 
+        component: UsersComponent,
+        canActivate: [roleGuard], 
+        data: { roles: ['Administrador'] }
+      },
+      { 
+        path: 'register', 
+        component: RegisterComponent,
+        canActivate: [roleGuard], 
+        data: { roles: ['Administrador'] } 
+      },
+
       { path: 'normas', component: NormsComponent },
       { path: 'normas/:id', component: NormsDetailComponent},
+    { path: 'normas/:id/edit', component: NormEditComponent },
 
       { path: '', redirectTo: 'generador', pathMatch: 'full' },
     ],

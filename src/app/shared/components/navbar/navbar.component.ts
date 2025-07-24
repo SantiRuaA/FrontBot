@@ -2,20 +2,28 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { Logout } from '../../../state/auth/auth.actions'; 
+import { Observable, map } from 'rxjs'; // <-- Importa 'map'
+import { Logout } from '../../../state/auth/auth.actions';
+import { AuthState } from '../../../state/auth/auth.state';
+import { User } from '../../../shared/models/user.model'; 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule ,RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  constructor(private store: Store) {}
+  public isAdmin$: Observable<boolean>;
+
+  constructor(private store: Store) {
+    this.isAdmin$ = this.store.select(AuthState.user).pipe(
+      map(user => user?.role?.toLowerCase() === 'administrador')
+    );
+  }
 
   logout(): void {
     this.store.dispatch(new Logout());
   }
-
 }

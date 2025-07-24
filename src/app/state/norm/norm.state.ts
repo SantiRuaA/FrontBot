@@ -3,7 +3,8 @@ import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { tap, catchError, of } from 'rxjs';
 import { Norm } from '../../shared/models/norm.model';
 import { NormService } from '../../core/services/norm.service'; // Asegúrate que la ruta sea correcta
-import { LoadNorms, LoadNormsSuccess, LoadNormsFailure, CreateNorm, CreateNormSuccess, CreateNormFailure } from './norm.actions';
+import { LoadNorms, LoadNormsSuccess, LoadNormsFailure, CreateNorm, CreateNormSuccess, CreateNormFailure, UpdateNorm, UpdateNormFailure, UpdateNormSuccess } from './norm.actions';
+import { Navigate } from '@ngxs/router-plugin';
 
 export interface NormStateModel {
   norms: Norm[];
@@ -89,5 +90,39 @@ export class NormState {
   @Action(CreateNormFailure)
   createNormFailure(ctx: StateContext<NormStateModel>, { error }: CreateNormFailure) {
     ctx.patchState({ error, loading: false });
+  }
+
+  @Action(UpdateNorm)
+  updateNorm(ctx: StateContext<NormStateModel>, { id, payload }: UpdateNorm) {
+    ctx.patchState({ loading: true, error: null });
+    return this.normService.updateNorm(id, payload).pipe(
+      tap((updatedNorm) => {
+        ctx.dispatch(new UpdateNormSuccess(updatedNorm));
+      }),
+      catchError((error) => {
+        ctx.dispatch(new UpdateNormFailure('Fallo al actualizar la norma'));
+        return of(error);
+      })
+    );
+  }
+
+  @Action(UpdateNormSuccess)
+  updateNormSuccess(ctx: StateContext<NormStateModel>, { norm }: UpdateNormSuccess) {
+    const state = ctx.getState();
+    const updatedNorms = state.norms.map(n => n._id === norm._id ? norm : n);
+    
+    ctx.patchState({
+      norms: updatedNorms,
+      loading: false,
+    });
+    return ctx.dispatch(new Navigate(['/normas']));
+  }
+
+  @Action(UpdateNormFailure)
+  updateNormFailure(ctx: StateContext<NormStateModel>, { error }: UpdateNormFailure) {
+    ctx.patchState({
+      loading: false,
+      error: error,
+    });
   }
 }
