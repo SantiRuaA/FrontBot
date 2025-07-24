@@ -13,19 +13,20 @@ import { NormsDetailComponent } from './admin/norms-detail/norms-detail.componen
 import { GeneratorComponent } from './chatbot/generator/generator.component';
 import { HelpComponent } from './chatbot/help/help.component';
 import { DocumentsComponent } from './chatbot/documents/documents.component';
+import { loginGuard } from './core/guards/login.guard';
 
 export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [authGuard],
-    data: { isPublic: true }
+    canActivate: [loginGuard],
   },
 
   {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard], 
+    canActivateChild: [authGuard],
     children: [
       { path: 'register', component: RegisterComponent },
       { path: 'generador', component: GeneratorComponent },

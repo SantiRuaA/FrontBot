@@ -3,6 +3,7 @@
   <div class="column is-half">
     <form class="box" [formGroup]="generatorForm" (ngSubmit)="onSubmit()">
       <div class="columns is-multiline">
+        <!-- Título -->
         <div class="column is-full">
           <div class="field">
             <label class="label" for="titulo">Título:</label>
@@ -12,6 +13,7 @@
           </div>
         </div>
 
+        <!-- Norma -->
         <div class="column is-half">
           <div class="field">
             <label class="label" for="norma">Norma:</label>
@@ -28,6 +30,7 @@
           </div>
         </div>
 
+        <!-- Categoría -->
         <div class="column is-half">
           <div class="field">
             <label class="label" for="categoria">Categoría:</label>
@@ -35,15 +38,14 @@
               <div class="select is-fullwidth">
                 <select id="categoria" formControlName="categoria">
                   <option [ngValue]="null" disabled>Seleccione una categoría...</option>
-                  <option *ngFor="let categoria of categorias" [value]="categoria">
-                    {{ categoria }}
-                  </option>
+                  <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
                 </select>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Criterio de Desempeño -->
         <div class="column is-half">
           <div class="field">
             <label class="label" for="criterioDesempeno">Criterio de Desempeño:</label>
@@ -60,6 +62,7 @@
           </div>
         </div>
 
+        <!-- Conocimiento -->
         <div class="column is-half">
           <div class="field">
             <label class="label" for="conocimiento">Conocimiento:</label>
@@ -76,6 +79,7 @@
           </div>
         </div>
 
+        <!-- Contexto y Reactivo (Textareas) -->
         <div class="column is-full">
           <div class="field">
             <label class="label" for="contexto">Contexto:</label>
@@ -84,7 +88,6 @@
             </div>
           </div>
         </div>
-
         <div class="column is-full">
           <div class="field">
             <label class="label" for="reactivo">Reactivo:</label>
@@ -94,22 +97,20 @@
           </div>
         </div>
 
+        <!-- Generar, Formato, Límite -->
         <div class="column is-half">
           <div class="field">
             <label class="label" for="generar">Generar:</label>
             <div class="control">
               <div class="select is-fullwidth">
                 <select id="generar" formControlName="generar">
-                  <option [ngValue]="null" disabled>Seleccione una opción...</option>
-                  <option *ngFor="let opcion of opcionesGenerar" [value]="opcion">
-                    {{ opcion }}
-                  </option>
+                  <option [ngValue]="null" disabled>Seleccione cantidad...</option>
+                  <option *ngFor="let opcion of generarOpciones" [value]="opcion">{{ opcion }}</option>
                 </select>
               </div>
             </div>
           </div>
         </div>
-
         <div class="column is-half">
           <div class="field">
             <label class="label" for="formato">Formato:</label>
@@ -117,15 +118,12 @@
               <div class="select is-fullwidth">
                 <select id="formato" formControlName="formato">
                   <option [ngValue]="null" disabled>Seleccione un formato...</option>
-                  <option *ngFor="let formato of formatos" [value]="formato">
-                    {{ formato }}
-                  </option>
+                  <option *ngFor="let formato of formatos" [value]="formato">{{ formato }}</option>
                 </select>
               </div>
             </div>
           </div>
         </div>
-
         <div class="column is-half">
           <div class="field">
             <label class="label" for="limite">Límite:</label>
@@ -133,24 +131,30 @@
               <div class="select is-fullwidth">
                 <select id="limite" formControlName="limite">
                   <option [ngValue]="null" disabled>Seleccione un límite...</option>
-                  <option *ngFor="let limite of limites" [value]="limite">
-                    {{ limite }}
-                  </option>
+                  <option *ngFor="let limite of limites" [value]="limite">{{ limite }}</option>
                 </select>
               </div>
             </div>
           </div>
         </div>
-
+        
+        <!-- Botón de Generar -->
         <div class="column is-full">
           <div class="field">
             <div class="control">
-              <button type="submit" class="button is-primary is-fullwidth" [disabled]="generatorForm.invalid">Generar</button>
+              <button type="submit" class="button is-primary is-fullwidth" 
+                      [disabled]="generatorForm.invalid || isLoadingResponse"
+                      [ngClass]="{'is-loading': isLoadingResponse}">
+                Generar
+              </button>
             </div>
           </div>
         </div>
       </div>
     </form>
   </div>
-  <div class="column"><app-items /></div>
+  <!-- El componente de items ahora recibe la lista de items generados -->
+  <div class="column">
+    <app-items [items]="generatedItems"></app-items>
+  </div>
 </div>

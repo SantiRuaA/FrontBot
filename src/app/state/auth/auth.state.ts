@@ -80,7 +80,7 @@ export class AuthState {
       error: null,
     });
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('authToken', token);
+      sessionStorage.setItem('authToken', token);
     }
     return ctx.dispatch(new Navigate(['/generador']));
   }
@@ -93,7 +93,7 @@ export class AuthState {
   @Action(Logout)
   logout(ctx: StateContext<AuthStateModel>) {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
     }
     ctx.setState({
       user: null, token: null, isAuthenticated: false, error: null, loading: false, sessionRestored: false
@@ -104,7 +104,7 @@ export class AuthState {
   @Action(RestoreSession)
   restoreSession(ctx: StateContext<AuthStateModel>) {
     if (isPlatformBrowser(this.platformId)) {
-      const token = localStorage.getItem('authToken');
+      const token = sessionStorage.getItem('authToken');
       if (token) {
         try {
           const decodedToken: any = jwtDecode(token);
@@ -121,12 +121,13 @@ export class AuthState {
             };
             ctx.patchState({ user: userForState, token, isAuthenticated: true });
           } else {
-            localStorage.removeItem('authToken');
+            sessionStorage.removeItem('authToken');
           }
         } catch {
-          localStorage.removeItem('authToken');
+          sessionStorage.removeItem('authToken');
         }
       }
     }
+    ctx.dispatch({sessionRestored: true})
   }
 }
