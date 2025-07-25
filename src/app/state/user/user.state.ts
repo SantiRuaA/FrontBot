@@ -8,6 +8,8 @@ import {
   LoadUsers,
   LoadUsersSuccess,
   LoadUsersFailure,
+  ChangeUserPage,
+  FilterUsers,
   CreateUser,
   CreateUserSuccess,
   CreateUserFailure,
@@ -17,47 +19,82 @@ import {
 } from './user.actions';
 
 export interface UserStateModel {
-  users: User[];
+  allUsers: User[];
   loading: boolean;
   error: string | null;
+  page: number;
+  limit: number;
+  filter: string;
 }
 
 @State<UserStateModel>({
   name: 'user',
   defaults: {
-    users: [],
+    allUsers: [],
     loading: false,
     error: null,
+    page: 1,
+    limit: 5,
+    filter: '',
   },
 })
 @Injectable()
 export class UserState {
   constructor(private userService: UserService) {}
 
+  // --- SELECTORES ---
+
   @Selector()
-  static users(state: UserStateModel): User[] {
-    return state.users;
+  static getVisibleUsers(state: UserStateModel): User[] {
+    const { allUsers, filter, page, limit } = state;
+
+    // 1. Filtra la lista completa
+    const filtered = !filter
+      ? allUsers
+      : allUsers.filter(user => {
+          const lowerCaseFilter = filter.toLowerCase();
+          return (
+            user.fullName.toLowerCase().includes(lowerCaseFilter) ||
+            user.email.toLowerCase().includes(lowerCaseFilter) ||
+            user.role.toLowerCase().includes(lowerCaseFilter)
+          );
+        });
+
+    // 2. Pagina la lista filtrada
+    const startIndex = (page - 1) * limit;
+    return filtered.slice(startIndex, startIndex + limit);
   }
 
   @Selector()
-  static loading(state: UserStateModel): boolean {
-    return state.loading;
+  static getTotalFiltered(state: UserStateModel): number {
+    const { allUsers, filter } = state;
+    if (!filter) {
+      return allUsers.length;
+    }
+    return allUsers.filter(user => {
+        const lowerCaseFilter = filter.toLowerCase();
+        return (
+          user.fullName.toLowerCase().includes(lowerCaseFilter) ||
+          user.email.toLowerCase().includes(lowerCaseFilter) ||
+          user.role.toLowerCase().includes(lowerCaseFilter)
+        );
+      }).length;
   }
-  
-  @Selector()
-  static error(state: UserStateModel): string | null {
-    return state.error;
-  }
+
+  @Selector() static currentPage(state: UserStateModel): number { return state.page; }
+  @Selector() static limit(state: UserStateModel): number { return state.limit; }
+  @Selector() static loading(state: UserStateModel): boolean { return state.loading; }
+  @Selector() static error(state: UserStateModel): string | null { return state.error; }
+
+  // --- ACCIONES ---
 
   @Action(LoadUsers)
   loadUsers(ctx: StateContext<UserStateModel>) {
     ctx.patchState({ loading: true, error: null });
     return this.userService.getUsers().pipe(
-      tap((users) => {
-        ctx.dispatch(new LoadUsersSuccess(users));
-      }),
+      tap((users) => ctx.dispatch(new LoadUsersSuccess(users))),
       catchError((error) => {
-        ctx.dispatch(new LoadUsersFailure('Fallo al cargar los usuarios'));
+        ctx.dispatch(new LoadUsersFailure('Fallo al cargar los usuarios desde la API.'));
         return of(error);
       })
     );
@@ -65,18 +102,22 @@ export class UserState {
 
   @Action(LoadUsersSuccess)
   loadUsersSuccess(ctx: StateContext<UserStateModel>, { users }: LoadUsersSuccess) {
-    ctx.patchState({
-      users: users,
-      loading: false,
-    });
+    ctx.patchState({ allUsers: users, loading: false });
   }
 
   @Action(LoadUsersFailure)
   loadUsersFailure(ctx: StateContext<UserStateModel>, { error }: LoadUsersFailure) {
-    ctx.patchState({
-      loading: false,
-      error: error,
-    });
+    ctx.patchState({ loading: false, error });
+  }
+
+  @Action(ChangeUserPage)
+  changeUserPage(ctx: StateContext<UserStateModel>, { page }: ChangeUserPage) {
+    ctx.patchState({ page });
+  }
+
+  @Action(FilterUsers)
+  filterUsers(ctx: StateContext<UserStateModel>, { filter }: FilterUsers) {
+    ctx.patchState({ filter, page: 1 });
   }
 
   @Action(CreateUser)
@@ -98,19 +139,15 @@ export class UserState {
   createUserSuccess(ctx: StateContext<UserStateModel>, { user }: CreateUserSuccess) {
     const state = ctx.getState();
     ctx.patchState({
-      users: [...state.users, user],
+      allUsers: [...state.allUsers, user],
       loading: false,
-      error: null,
     });
     return ctx.dispatch(new Navigate(['/usuarios']));
   }
 
   @Action(CreateUserFailure)
   createUserFailure(ctx: StateContext<UserStateModel>, { error }: CreateUserFailure) {
-    ctx.patchState({
-      loading: false,
-      error: error,
-    });
+    ctx.patchState({ loading: false, error: error });
   }
 
   @Action(UpdateUser)
@@ -131,21 +168,16 @@ export class UserState {
   @Action(UpdateUserSuccess)
   updateUserSuccess(ctx: StateContext<UserStateModel>, { user }: UpdateUserSuccess) {
     const state = ctx.getState();
-    const updatedUsers = state.users.map(u => u.id === user.id ? user : u);
-    
+    const updatedUsers = state.allUsers.map(u => u.id === user.id ? user : u);
     ctx.patchState({
-      users: updatedUsers,
+      allUsers: updatedUsers,
       loading: false,
-      error: null,
     });
     return ctx.dispatch(new Navigate(['/usuarios']));
   }
 
   @Action(UpdateUserFailure)
   updateUserFailure(ctx: StateContext<UserStateModel>, { error }: UpdateUserFailure) {
-    ctx.patchState({
-      loading: false,
-      error: error,
-    });
+    ctx.patchState({ loading: false, error: error });
   }
 }

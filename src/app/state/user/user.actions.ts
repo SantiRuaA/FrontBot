@@ -6,7 +6,7 @@ export class LoadUsers {
 
 export class LoadUsersSuccess {
     static readonly type = '[User] Load Users Success';
-    constructor(public users: User[]) { } // El payload es el array de usuarios
+    constructor(public users: User[]) { }
 }
 
 export class LoadUsersFailure {
@@ -14,9 +14,19 @@ export class LoadUsersFailure {
     constructor(public error: string) { }
 }
 
+export class ChangeUserPage {
+  static readonly type = '[User] Change Page';
+  constructor(public page: number) {}
+}
+
+export class FilterUsers {
+  static readonly type = '[User] Filter Users';
+  constructor(public filter: string) {}
+}
+
 export class CreateUser {
   static readonly type = '[User] Create User';
-  constructor(public payload: any) {} // El payload son los datos del formulario
+  constructor(public payload: any) {} 
 }
 
 export class CreateUserSuccess {
@@ -43,3 +53,4 @@ export class UpdateUserFailure {
   static readonly type = '[User] Update User Failure';
   constructor(public error: string) {}
 }
+

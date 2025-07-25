@@ -16,6 +16,17 @@
             </div>
         </div>
     </div>
+
+    <div class="field mb-5">
+      <label class="label">Buscar Usuario</label>
+      <div class="control has-icons-left">
+        <input class="input" type="text" placeholder="Buscar por nombre, correo o rol..." (keyup)="applyFilter($event)">
+        <span class="icon is-left">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+    </div>
+
     <div class="box is-shadow-1 is-rounded overflow-hidden">
         <div class="table-container">
             <table class="table is-fullwidth is-hoverable">
@@ -32,7 +43,7 @@
                 </thead>
                 <tbody *ngIf="users$ | async as users; else loading">
                     <tr *ngIf="users.length === 0">
-                        <td colspan="5" class="has-text-centered">No se encontraron usuarios.</td>
+                        <td colspan="5" class="has-text-centered">No se encontraron usuarios con ese filtro.</td>
                     </tr>
                     <tr *ngFor="let user of users">
                         <td>
@@ -70,13 +81,39 @@
             </table>
         </div>
     </div>
-    </div>
+    
+    <ng-container *ngIf="{ 
+        total: total$ | async, 
+        limit: limit$ | async, 
+        currentPage: currentPage$ | async 
+      } as pagination">
+    
+      <nav class="pagination is-centered mt-4" role="navigation" *ngIf="pagination.total! > pagination.limit!">
+          <button class="pagination-previous" 
+                  (click)="changePage(pagination.currentPage! - 1)" 
+                  [disabled]="pagination.currentPage === 1">
+              Anterior
+          </button>
+          <button class="pagination-next" 
+                  (click)="changePage(pagination.currentPage! + 1)" 
+                  [disabled]="pagination.currentPage! * pagination.limit! >= pagination.total!">
+              Siguiente
+          </button>
+          <ul class="pagination-list">
+              <li>
+                  <a class="pagination-link is-current">{{ pagination.currentPage }}</a>
+              </li>
+          </ul>
+      </nav>
+    
+    </ng-container>
+</div>
 
 <ng-template #loading>
     <tbody>
         <tr>
             <td colspan="5" class="has-text-centered py-5">
-                <button class="button is-loading is-ghost">Cargando</button>
+                <button class="button is-loading is-ghost">Cargando usuarios...</button>
             </td>
         </tr>
     </tbody>

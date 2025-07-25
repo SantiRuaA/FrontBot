@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { UserState } from '../../state/user/user.state';
-import { LoadUsers } from '../../state/user/user.actions'; 
+import { ChangeUserPage, FilterUsers, LoadUsers } from '../../state/user/user.actions';
 
 @Component({
   selector: 'app-user',
@@ -14,17 +14,34 @@ import { LoadUsers } from '../../state/user/user.actions';
   templateUrl: './users.component.html',
 })
 export class UsersComponent implements OnInit {
-  public users$: Observable<User[]>;
-  public loading$: Observable<boolean>;
+  users$: Observable<User[]>;
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
+  total$: Observable<number>;
+  currentPage$: Observable<number>;
+  limit$: Observable<number>;
 
   constructor(private store: Store) {
-    // Conectamos los observables a los selectors del estado 'user'
-    this.users$ = this.store.select(UserState.users);
+
+    this.users$ = this.store.select(UserState.getVisibleUsers);
+    this.total$ = this.store.select(UserState.getTotalFiltered);
+
     this.loading$ = this.store.select(UserState.loading);
+    this.error$ = this.store.select(UserState.error);
+    this.currentPage$ = this.store.select(UserState.currentPage);
+    this.limit$ = this.store.select(UserState.limit);
   }
 
   ngOnInit(): void {
-    // Despachamos la acción para cargar los usuarios
     this.store.dispatch(new LoadUsers());
+  }
+
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.store.dispatch(new FilterUsers(filterValue));
+  }
+
+  changePage(page: number): void {
+    this.store.dispatch(new ChangeUserPage(page));
   }
 }

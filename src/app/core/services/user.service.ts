@@ -65,8 +65,8 @@ export class UserService {
     constructor(private http: HttpClient) { }
 
     getUsers(): Observable<User[]> {
-        return this.http.get<UserApiResponse[]>(this.apiUrl).pipe(
-            map(apiResponse => apiResponse.map(apiUser => this.mapApiToUser(apiUser)))
+        return this.http.get<any[]>(this.apiUrl).pipe(
+        map(apiResponse => apiResponse.map(apiUser => this.mapApiToUser(apiUser)))
         );
     }
 
