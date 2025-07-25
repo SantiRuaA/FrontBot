@@ -42,6 +42,18 @@ export const routes: Routes = [
         data: { roles: ['Administrador'] }
       },
       { 
+        path: 'usuarios/:id', 
+        component: UserDetailComponent,
+        canActivate: [roleGuard], 
+        data: { roles: ['Administrador'] }
+      },
+      { 
+        path: 'usuarios/:id/edit', 
+        component: UserEditComponent,
+        canActivate: [roleGuard], 
+        data: { roles: ['Administrador'] }
+      },
+      { 
         path: 'register', 
         component: RegisterComponent,
         canActivate: [roleGuard], 
