@@ -1,77 +1,50 @@
-<div class="container box">
-    <div class="card p-5">
-        <div class="columns is-variable is-4 mb-5">
-            <div class="column is-two-thirds">
-                <label class="label has-text-weight-semibold mb-1">Buscar tickets:</label>
-                <div class="control has-icons-left">
-                    <input class="input is-rounded" type="text" placeholder="Buscar por título, ID o contenido...">
-                    <span class="icon is-left">
-                        <i class="fas fa-search"></i>
-                    </span>
-                </div>
-            </div>
-            <div class="column">
-                <label class="label has-text-weight-semibold mb-1">Filtrar por categoría:</label>
-                <div class="select is-fullwidth is-rounded">
-                    <select>
-                        <option>Todos</option>
-                        <option>Soporte Técnico</option>
-                        <option>Académico</option>
-                        <option>Urgente</option>
-                    </select>
-                </div>
-            </div>
+<div class="container is-fullhd box">
+  <h1 class="title">Items Guardados</h1>
+  <p class="subtitle">Aquí encontrarás todas las respuestas que has guardado desde el generador.</p>
+
+  <ng-container *ngIf="view$ | async as view">
+    <ng-container *ngIf="!view.isLoading; else loadingTemplate">
+      <div *ngIf="view.documents.length === 0" class="notification is-info is-light">
+        No hay items guardados todavía. Ve al generador para crear y guardar algunos.
+      </div>
+
+      <div *ngFor="let doc of view.documents" class="card mb-4">
+        <div class="card-content">
+          <div class="content" [innerHTML]="doc.content | nl2br"></div>
         </div>
+        <footer class="card-footer">
+          <p class="card-footer-item">
+            <span>Guardado por: <strong class="has-text-grey">{{ doc.role }}</strong></span>
+          </p>
+          <p class="card-footer-item">
+            <span>Fecha: <strong class="has-text-grey">{{ doc.createdAt | date:'short' }}</strong></span>
+          </p>
+        </footer>
+      </div>
 
-        <h3 class="title is-5 mb-4">Tickets Activos</h3>
+      <nav class="pagination is-centered mt-4" role="navigation" *ngIf="view.total > view.limit">
+        <button class="pagination-previous" 
+                (click)="changePage(view.currentPage - 1)" 
+                [disabled]="view.currentPage === 1">
+            Anterior
+        </button>
+        <button class="pagination-next" 
+                (click)="changePage(view.currentPage + 1)" 
+                [disabled]="view.currentPage * view.limit >= view.total">
+            Siguiente
+        </button>
+        <ul class="pagination-list">
+            <li>
+                <a class="pagination-link is-current">{{ view.currentPage }}</a>
+            </li>
+        </ul>
+      </nav>
+    </ng-container>
+  </ng-container>
 
-        <div class="list is-hoverable">
-            <div class="box mb-4" *ngFor="let ticket of paginatedTickets">
-                <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
-                    <strong>Ticket #0000{{ ticket.id }}: {{ ticket.title }}</strong>
-                    <span class="icon is-clickable"><i class="fas fa-angle-down"></i></span>
-                </div>
-                <div>
-                    <p>{{ ticket.description }}</p>
-                    <small class="has-text-grey">Creado: {{ ticket.createdDate }}</small>
-                    <div class="tags are-small mt-2">
-                        <span *ngFor="let tag of ticket.tags" class="tag is-light {{ tag.class }}">
-                            {{ tag.text }}
-                        </span>
-                    </div>
-                </div>
-                <div class="buttons mt-3">
-                    <button class="button is-small is-light"><i class="fas fa-save"></i></button>
-                    <button class="button is-small is-light has-text-danger"><i class="fas fa-trash-alt"></i></button>
-                    <button class="button is-small is-light has-text-info"><i class="fas fa-paper-plane"></i></button>
-                    <label class="checkbox ml-3">
-                        <input type="checkbox">
-                        <span class="icon is-small has-text-success"><i class="fa-solid fa-thumbs-up"></i></span>
-                    </label>
-                </div>
-            </div>
-             <div *ngIf="paginatedTickets.length === 0" class="has-text-centered has-text-grey-light">
-                <p>No hay tickets para mostrar en esta página.</p>
-            </div>
-        </div>
-
-        <nav class="pagination is-centered mt-5" role="navigation" aria-label="pagination">
-            <button class="pagination-previous" (click)="previousPage()" [disabled]="currentPage === 1">
-              Anterior
-            </button>
-            <button class="pagination-next" (click)="nextPage()" [disabled]="currentPage === totalPages">
-              Siguiente
-            </button>
-            <ul class="pagination-list">
-                <li *ngFor="let page of pages">
-                    <a class="pagination-link"
-                       (click)="goToPage(page)"
-                       [class.is-current]="page === currentPage"
-                       [attr.aria-label]="'Goto page ' + page">
-                        {{ page }}
-                    </a>
-                </li>
-            </ul>
-        </nav>
+  <ng-template #loadingTemplate>
+    <div class="has-text-centered p-6">
+      <button class="button is-loading is-ghost is-large">Cargando items...</button>
     </div>
+  </ng-template>
 </div>

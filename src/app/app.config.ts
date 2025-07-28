@@ -13,6 +13,7 @@ import { AuthState } from './state/auth/auth.state';
 import { NormState } from './state/norm/norm.state';
 import { authInterceptor } from './core/interceptors/auth.interceptors';
 import { GeneratorState } from './state/generator/generator.state';
+import { DocumentState } from './state/document/document.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,7 +24,7 @@ export const appConfig: ApplicationConfig = {
 
     importProvidersFrom(
       NgxsModule.forRoot(
-        [UserState, AuthState, NormState, GeneratorState],
+        [UserState, AuthState, NormState, GeneratorState, DocumentState],
         { developmentMode: isDevMode() }
       ),
       NgxsRouterPluginModule.forRoot(),

@@ -43,7 +43,6 @@ export class GeneratorComponent implements OnInit {
 
   ngOnInit(): void {
     this.generatorForm = this.fb.group({
-      titulo: ['', Validators.required],
       norma: [null, Validators.required],
       categoria: [null, Validators.required],
       criterioDesempeno: [null, Validators.required],
@@ -97,17 +96,20 @@ export class GeneratorComponent implements OnInit {
       const selectedNorm = norms.find(n => n._id === formValue.norma);
       const normaNombre = selectedNorm ? selectedNorm.normaCertificacion : '';
 
-      const prompt = `Necesito por favor que generes ${formValue.generar} pregunta(s), con el formato de pregunta estilo: ${formValue.formato}, utilizando esta información a continuación; norma: ${normaNombre}, con este criterio: ${formValue.criterioDesempeno}, tipo de conocimiento: ${formValue.conocimiento}, usando este contexto: ${formValue.contexto}, en este reactivo: ${formValue.reactivo}, limitando el texto de la pregunta a solo: ${formValue.limite}, con su respectiva respuesta correcta. Responde solo lo que te pido, no necesito ninguna otra información. Gracias.`;
-      
-      console.log('Enviando Prompt:', prompt);
+      let prompt = `Necesito por favor que generes ${formValue.generar} pregunta(s), con el formato de pregunta estilo: ${formValue.formato}, utilizando esta información a continuación; norma: ${normaNombre}, con este criterio: ${formValue.criterioDesempeno}, tipo de conocimiento: ${formValue.conocimiento}, usando este contexto: ${formValue.contexto}, en este reactivo: ${formValue.reactivo}, limitando el texto de la pregunta a solo: ${formValue.limite}, con su respectiva respuesta correcta. Responde solo lo que te pido, no necesito ninguna otra información. Gracias.`;
+
+      if (parseInt(formValue.generar, 10) > 1) {
+        prompt += ` IMPORTANTE: Separa cada una de las preguntas generadas usando el siguiente texto exacto como separador: ---###---`;
+      }
 
       this.chatService.generateResponse(prompt).subscribe({
         next: (response) => {
-          const newItem: Item = {
-            content: response.response,
+          const responseParts = response.response.split('---###---');
+          const newItems: Item[] = responseParts.map(part => ({
+            content: part.trim(),
             createdDate: new Date().toLocaleDateString('es-CO')
-          };
-          this.generatedItems = [newItem, ...this.generatedItems];
+          }));
+          this.generatedItems = [...newItems, ...this.generatedItems];
           this.isLoadingResponse = false;
         },
         error: (err) => {

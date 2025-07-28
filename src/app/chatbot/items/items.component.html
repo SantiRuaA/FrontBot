@@ -9,7 +9,6 @@
     <div class="column is-full" *ngFor="let item of items">
       <div class="card mb-4">
         <header class="card-header">
-          
           <button class="card-header-icon" aria-label="more options">
             <span class="icon">
               <i class="fas fa-angle-down" aria-hidden="true"></i>
@@ -23,7 +22,11 @@
           </div>
         </div>
         <footer class="card-footer p-3">
-          <div class="card-footer-item"><button class="button is-ghost"><span class="icon"><i class="fas fa-save"></i></span></button></div>
+          <div class="card-footer-item">
+            <button class="button is-ghost" (click)="onSave(item.content)">
+              <span class="icon"><i class="fas fa-save"></i></span>
+            </button>
+          </div>
           <div class="card-footer-item"><button class="button is-ghost"><span class="icon has-text-danger"><i class="fas fa-trash-alt"></i></span></button></div>
           <div class="card-footer-item"><button class="button is-ghost"><span class="icon has-text-info"><i class="fas fa-paper-plane"></i></span></button></div>
           <div class="card-footer-item"><label class="checkbox"><input type="checkbox"><span class="icon is-small has-text-success"><i class="fa-solid fa-thumbs-up"></i></span></label></div>

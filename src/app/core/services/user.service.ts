@@ -84,7 +84,7 @@ export class UserService {
     }
 
     updateUser(id: string, userData: any): Observable<User> {
-        return this.http.put<UserApiResponse>(`${this.apiUrl}/${id}`, userData).pipe(
+        return this.http.patch<UserApiResponse>(`${this.apiUrl}/${id}`, userData).pipe(
         map(apiUser => this.mapApiToUser(apiUser))
         );
     }

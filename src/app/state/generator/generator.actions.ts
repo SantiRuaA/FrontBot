@@ -14,3 +14,18 @@ export class GenerateItemsFailure {
   static readonly type = '[Generator] Generate Items Failure';
   constructor(public error: string) {}
 }
+
+export class SaveAnswer {
+  static readonly type = '[Generator] Save Answer';
+  constructor(public payload: { content: string }) {}
+}
+
+export class SaveAnswerSuccess {
+  static readonly type = '[Generator] Save Answer Success';
+  constructor(public savedAnswer: any) {}
+}
+
+export class SaveAnswerFailure {
+  static readonly type = '[Generator] Save Answer Failure';
+  constructor(public error: any) {}
+}
