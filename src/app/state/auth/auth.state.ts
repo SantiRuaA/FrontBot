@@ -1,14 +1,14 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { tap, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { State, Action, StateContext, Selector, Store, Actions, ofActionSuccessful } from '@ngxs/store';
+import { tap, catchError, of, take } from 'rxjs';
 import { Navigate } from '@ngxs/router-plugin';
 import { jwtDecode } from 'jwt-decode';
 
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../shared/models/user.model';
-import { Login, LoginSuccess, LoginFailure, Logout, RestoreSession } from './auth.actions';
+import { Login, LoginSuccess, LoginFailure, Logout, RestoreSession, UpdateAuthenticatedUser } from './auth.actions';
+import { LoadUsers, LoadUsersSuccess } from '../user/user.actions';
 
 export interface AuthStateModel {
   user: User | null;
@@ -34,6 +34,8 @@ export interface AuthStateModel {
 export class AuthState {
   constructor(
     private authService: AuthService,
+    private store: Store,
+    private actions$: Actions,
     @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
@@ -41,22 +43,22 @@ export class AuthState {
   @Selector() static user(state: AuthStateModel): User | null { return state.user; }
   @Selector() static loading(state: AuthStateModel): boolean { return state.loading; }
   @Selector() static error(state: AuthStateModel): string | null { return state.error; }
-  @Selector() static sessionRestored(state: AuthStateModel): boolean {return state.sessionRestored;}
   @Selector() static token(state: AuthStateModel): string | null { return state.token;}
 
   @Action(Login)
   login(ctx: StateContext<AuthStateModel>, { correo_sena, password }: Login) {
     ctx.patchState({ loading: true, error: null });
     return this.authService.login(correo_sena, password).pipe(
-      tap((response) => {
+      tap((response: any) => {
         const token = response.accessToken;
         const decodedToken: any = jwtDecode(token);
+
         const userForState: User = {
-          id: decodedToken.sub || decodedToken.id,
-          tenantId: decodedToken.tenantId,
-          email: decodedToken.email,
-          role: decodedToken.role,
-          fullName: decodedToken.name || 'Usuario',
+          id: decodedToken.sub || decodedToken.id || '',
+          tenantId: decodedToken.tenantId || 0,
+          email: response.user.correo_sena,
+          role: response.user.rol_asignado,
+          fullName: 'Cargando...',
           department: '',
           status: true,
           image: 'assets/logosena.png',
@@ -82,7 +84,28 @@ export class AuthState {
     if (isPlatformBrowser(this.platformId)) {
       sessionStorage.setItem('authToken', token);
     }
+
+    ctx.dispatch(new LoadUsers());
+
+    this.actions$.pipe(
+      ofActionSuccessful(LoadUsersSuccess),
+      take(1)
+    ).subscribe(() => {
+      const state = this.store.snapshot();
+      const allUsers = state.user.allUsers;
+      const fullUser = allUsers.find((u: User) => u.email === user.email);
+
+      if (fullUser) {
+        ctx.dispatch(new UpdateAuthenticatedUser(fullUser));
+      }
+    });
+
     return ctx.dispatch(new Navigate(['/generador']));
+  }
+
+  @Action(UpdateAuthenticatedUser)
+  updateAuthenticatedUser(ctx: StateContext<AuthStateModel>, { user }: UpdateAuthenticatedUser) {
+    ctx.patchState({ user });
   }
 
   @Action(LoginFailure)
@@ -128,6 +151,7 @@ export class AuthState {
         }
       }
     }
-    ctx.dispatch({sessionRestored: true})
+    ctx.patchState({ sessionRestored: true });
+    return of(null);
   }
 }

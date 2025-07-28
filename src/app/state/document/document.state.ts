@@ -8,6 +8,10 @@ import { AuthState } from '../auth/auth.state';
 import { User } from '../../shared/models/user.model';
 import { UserState, UserStateModel } from '../user/user.state';
 
+export interface DocumentView extends Document {
+  authorName: string;
+}
+
 export interface DocumentStateModel {
   allDocuments: Document[];
   loading: boolean;
@@ -17,7 +21,7 @@ export interface DocumentStateModel {
 }
 
 export interface DocumentsViewModel {
-  documents: Document[];
+  documents: DocumentView[];
   isLoading: boolean;
   total: number;
   currentPage: number;
@@ -40,31 +44,48 @@ export class DocumentState {
   
   @Selector([DocumentState, AuthState.user, UserState])
   static getViewModel(state: DocumentStateModel, authUser: User | null, userState: UserStateModel): DocumentsViewModel {
-    let visibleDocuments: Document[] = [];
+    
+    if (!authUser || !userState || !state) {
+      return {
+        documents: [],
+        isLoading: state.loading,
+        total: 0,
+        currentPage: state.page,
+        limit: state.limit
+      };
+    }
 
-    if (authUser) {
-      const userRole = authUser.role?.toLowerCase();
-      if (userRole === 'administrador' || userRole === 'evaluador') {
-        visibleDocuments = state.allDocuments;
-      } else {
-        const allUsers = userState.allUsers;
-        if (allUsers && allUsers.length > 0) {
-          const fullCurrentUser = allUsers.find(user => user.email === authUser.email);
-          if (fullCurrentUser) {
-            visibleDocuments = state.allDocuments.filter(doc => doc.userId === fullCurrentUser.id);
-          }
+    let visibleDocuments: Document[] = [];
+    const userRole = authUser.role?.toLowerCase();
+    const allUsers = userState.allUsers;
+
+    if (userRole === 'administrador' || userRole === 'evaluador') {
+      visibleDocuments = state.allDocuments;
+    } else {
+      if (allUsers && allUsers.length > 0) {
+        const fullCurrentUser = allUsers.find(user => user.email === authUser.email);
+        if (fullCurrentUser) {
+          visibleDocuments = state.allDocuments.filter(doc => doc.userId === fullCurrentUser.id);
         }
       }
     }
 
-    const sorted = [...visibleDocuments].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const documentsWithAuthors: DocumentView[] = visibleDocuments.map(doc => {
+      const author = allUsers.find(user => user.id === doc.userId);
+      return {
+        ...doc,
+        authorName: author ? author.fullName : 'Usuario Desconocido'
+      };
+    });
+
+    const sorted = [...documentsWithAuthors].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     const startIndex = (state.page - 1) * state.limit;
     const paginated = sorted.slice(startIndex, startIndex + state.limit);
 
     return {
       documents: paginated,
       isLoading: state.loading,
-      total: visibleDocuments.length,
+      total: documentsWithAuthors.length,
       currentPage: state.page,
       limit: state.limit
     };

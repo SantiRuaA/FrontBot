@@ -25,3 +25,8 @@ export class Logout {
 export class RestoreSession {
   static readonly type = '[Auth] Restore Session';
 }
+
+export class UpdateAuthenticatedUser {
+  static readonly type = '[Auth] Update Authenticated User';
+  constructor(public user: User) {}
+}

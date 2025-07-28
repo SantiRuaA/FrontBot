@@ -27,6 +27,11 @@
     </div>
 
     <div class="navbar-end">
+      <div class="navbar-item" *ngIf="user$ | async as user">
+        <p>
+          Bienvenido, <strong>{{ user.fullName }}</strong>
+        </p>
+      </div>
       <div class="navbar-item">
         <div class="buttons">
           <button class="button is-light" (click)="logout()">
