@@ -21,13 +21,13 @@
 
 .navbar-start .navbar-item:hover {
   background-color: transparent !important;
-  color: hsl(217, 71%, 53%) !important;
-  border-bottom-color: hsl(217, 71%, 53%);
+  color: rgb(57, 169, 0) !important;
+  border-bottom-color: rgb(57, 169, 0);
 }
 
 .navbar-start .navbar-item.is-active {
   background-color: transparent !important;
-  color: hsl(217, 71%, 53%) !important;
-  border-bottom-color: hsl(217, 71%, 53%);
+  color: rgb(57, 169, 0) !important;
+  border-bottom-color: rgb(57, 169, 0) !important;
   font-weight: 600;
 }

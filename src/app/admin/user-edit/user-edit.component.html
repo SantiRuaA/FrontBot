@@ -29,7 +29,7 @@
                 <div class="field">
                     <label class="label" for="numero_identificacion">Número de Identificación</label>
                     <div class="control">
-                        <input class="input" type="text" id="numero_identificacion" formControlName="numero_identificacion" placeholder="Ej: 1234567890">
+                        <input readonly class="input" type="text" id="numero_identificacion" formControlName="numero_identificacion" placeholder="Ej: 1234567890">
                     </div>
                 </div>
             </div>
@@ -215,7 +215,7 @@
                 </button>
             </div>
             <div class="control">
-                <a routerLink="/usuarios" class="button is-light is-large">Cancelar</a>
+                <a [routerLink]="['/usuarios']" class="button is-light is-large">Cancelar</a>
             </div>
         </div>
     </form>

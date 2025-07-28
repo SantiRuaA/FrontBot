@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -12,7 +12,7 @@ import { UserService } from '../../core/services/user.service';
 @Component({
   selector: 'app-user-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './user-edit.component.html',
 })
 export class UserEditComponent implements OnInit {
@@ -53,7 +53,7 @@ export class UserEditComponent implements OnInit {
         fecha_inicio_contrato: ['', Validators.required],
         fecha_fin_contrato: ['', Validators.required],
         numero_contrato: [''],
-        rol_asignado: ['Instructor', Validators.required],
+        rol_asignado: ['', Validators.required],
     });
 
     this.userId = this.route.snapshot.paramMap.get('id')!;

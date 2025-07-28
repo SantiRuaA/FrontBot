@@ -3,3 +3,64 @@
 body {
   font-family: 'Nunito', sans-serif;
 }
+
+.card {
+  position: relative;
+  overflow: hidden; /* Para que el indicador no se salga */
+}
+
+.card.animate__animated {
+  --animate-duration: 0.5s;
+}
+
+.status-indicator {
+  position: absolute;
+  top: 10px;
+  right: -50px;
+  transform: rotate(45deg);
+  padding: 5px 50px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1);
+  z-index: 1;
+}
+
+.status-indicator.is-saved {
+  background-color: rgb(57, 169, 0); /* Verde de Bulma */
+}
+
+.status-indicator.is-not-saved {
+  background-color: hsl(348, 100%, 61%); /* Rojo de Bulma */
+}
+
+.status-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  background-color: white;
+}
+
+.button.is-primary {
+  background-color: rgb(57, 169, 0);
+  border-color: transparent;
+}
+
+.button.is-primary:hover {
+  background-color: rgb(49, 145, 0);
+  border-color: transparent;
+}
+
+.button.is-primary.is-loading::after {
+  border-color: transparent transparent white white;
+}
+
+.tabs li.is-active a {
+  border-bottom-color: rgb(57, 169, 0);
+  color: rgb(57, 169, 0);
+}

@@ -2,11 +2,15 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Nl2brPipe } from '../../shared/pipes/nl2br.pipe';
 import { Store } from '@ngxs/store';
-import { SaveAnswer } from '../../state/generator/generator.actions';
+import { SaveAnswer, ToggleItemCollapse } from '../../state/generator/generator.actions';
 
 export interface Item {
+  tempId: string;
+  title: string;
   content: string;
   createdDate: string;
+  isSaved: boolean; 
+  isCollapsed: boolean;
 }
 
 @Component({
@@ -20,8 +24,12 @@ export class ItemsComponent {
 
   constructor(private store: Store) {}
 
-  onSave(content: string): void {
-    if (!content) return;
-    this.store.dispatch(new SaveAnswer({ content }));
+  onSave(item: Item): void {
+    if (!item || item.isSaved) return;
+    this.store.dispatch(new SaveAnswer({ content: item.content, tempId: item.tempId }));
+  }
+
+  toggleCollapse(item: Item): void {
+    this.store.dispatch(new ToggleItemCollapse(item.tempId));
   }
 }

@@ -62,7 +62,13 @@ export const routes: Routes = [
 
       { path: 'normas', component: NormsComponent },
       { path: 'normas/:id', component: NormsDetailComponent},
-    { path: 'normas/:id/edit', component: NormEditComponent },
+      
+      { 
+        path: 'normas/:id/edit', 
+        component: NormEditComponent,
+        canActivate: [roleGuard], 
+        data: { roles: ['Administrador'] } 
+      },
 
       { path: '', redirectTo: 'generador', pathMatch: 'full' },
     ],

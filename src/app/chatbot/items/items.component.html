@@ -5,31 +5,56 @@
         <p class="has-text-centered">Las respuestas generadas por la IA aparecerán aquí.</p>
       </div>
     </div>
-
-    <div class="column is-full" *ngFor="let item of items">
+    <div 
+      class="column is-full animate__animated animate__fadeInUp" 
+      *ngFor="let item of items; let i = index"
+      [style.animation-delay]="i * 100 + 'ms'">
       <div class="card mb-4">
-        <header class="card-header">
-          <button class="card-header-icon" aria-label="more options">
+        
+        <div *ngIf="item.isSaved" class="status-indicator is-saved">
+          Guardada
+        </div>
+
+        <header class="card-header is-clickable" (click)="toggleCollapse(item)">
+          <p class="card-header-title">
+            {{ item.title }}
+          </p>
+          <a class="card-header-icon" aria-label="expand">
             <span class="icon">
-              <i class="fas fa-angle-down" aria-hidden="true"></i>
+              <i class="fas" [class.fa-angle-down]="!item.isCollapsed" [class.fa-angle-up]="item.isCollapsed"></i>
             </span>
-          </button>
+          </a>
         </header>
-        <div class="card-content">
+
+        <div class="card-content" *ngIf="!item.isCollapsed">
           <div class="content">
             <p [innerHTML]="item.content | nl2br"></p>
             <small class="has-text-grey">Creado: {{ item.createdDate }}</small>
           </div>
         </div>
-        <footer class="card-footer p-3">
+
+        <footer class="card-footer p-3" *ngIf="!item.isCollapsed">
           <div class="card-footer-item">
-            <button class="button is-ghost" (click)="onSave(item.content)">
+            <button class="button is-ghost" (click)="onSave(item)" [disabled]="item.isSaved" title="Guardar Item">
               <span class="icon"><i class="fas fa-save"></i></span>
             </button>
           </div>
-          <div class="card-footer-item"><button class="button is-ghost"><span class="icon has-text-danger"><i class="fas fa-trash-alt"></i></span></button></div>
-          <div class="card-footer-item"><button class="button is-ghost"><span class="icon has-text-info"><i class="fas fa-paper-plane"></i></span></button></div>
-          <div class="card-footer-item"><label class="checkbox"><input type="checkbox"><span class="icon is-small has-text-success"><i class="fa-solid fa-thumbs-up"></i></span></label></div>
+          <div class="card-footer-item">
+            <button class="button is-ghost" title="Eliminar Item">
+              <span class="icon has-text-danger"><i class="fas fa-trash-alt"></i></span>
+            </button>
+          </div>
+          <div class="card-footer-item">
+            <button class="button is-ghost" title="Enviar Item">
+              <span class="icon has-text-info"><i class="fas fa-paper-plane"></i></span>
+            </button>
+          </div>
+          <div class="card-footer-item">
+            <label class="checkbox" title="Aprobar Item">
+              <input type="checkbox">
+              <span class="icon is-small has-text-success"><i class="fa-solid fa-thumbs-up"></i></span>
+            </label>
+          </div>
         </footer>
       </div>
     </div>

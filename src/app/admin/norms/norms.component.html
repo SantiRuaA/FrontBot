@@ -1,3 +1,4 @@
+<div class="column is-full"><app-headerGenerator/></div>
 <div class="container is-fullhd">
   <form class="box p-5" [formGroup]="normForm" (ngSubmit)="onSubmit()">
     <div class="level mb-4">
@@ -115,11 +116,11 @@
                     <span class="icon is-small"><i class="fas fa-eye"></i></span>
                     <span>Ver</span>
                   </button>
-                  <button [routerLink]="['/normas', norm._id, 'edit']" class="button is-link is-small">
+                  <button *ngIf="isAdmin$ | async" [routerLink]="['/normas', norm._id, 'edit']" class="button is-link is-small">
                     <span class="icon"><i class="fas fa-edit"></i></span>
                     <span>Editar</span>
                   </button>
-                  <button type="button" class="button is-danger is-small">
+                  <button *ngIf="isAdmin$ | async" type="button" class="button is-danger is-small">
                     <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
                     <span>Eliminar</span>
                   </button>

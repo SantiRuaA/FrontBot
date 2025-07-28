@@ -1,22 +1,25 @@
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, Selector, Store, ofActionSuccessful, Actions } from '@ngxs/store';
-import { tap, catchError, of, switchMap, take } from 'rxjs';
+import { State, Action, StateContext, Selector, Store } from '@ngxs/store';
+import { tap, catchError, of, switchMap } from 'rxjs';
 import { Item } from '../../chatbot/items/items.component';
 import { ChatService } from '../../core/services/chat.service';
+import { 
+  GenerateItems, 
+  AddGeneratedItems, 
+  GenerateItemsFailure,
+  ClearGeneratedItems,
+  SaveAnswer,
+  SaveAnswerSuccess,
+  SaveAnswerFailure,
+  ToggleItemCollapse
+} from './generator.actions';
+import { NotificationService } from '../../core/services/notification.service';
 import { AnswerService, AnswerPayload } from '../../core/services/answer.service';
 import { AuthState } from '../auth/auth.state';
 import { AddDocument } from '../document/document.actions';
 import { Document } from '../../shared/models/document.model';
 import { User } from '../../shared/models/user.model';
 import { LoadUsers } from '../user/user.actions';
-import { 
-  GenerateItems, 
-  GenerateItemsSuccess, 
-  GenerateItemsFailure,
-  SaveAnswer,
-  SaveAnswerSuccess,
-  SaveAnswerFailure
-} from './generator.actions';
 
 export interface GeneratorStateModel {
   generatedItems: Item[];
@@ -37,8 +40,8 @@ export class GeneratorState {
   constructor(
     private chatService: ChatService,
     private answerService: AnswerService,
-    private store: Store,
-    private actions$: Actions
+    private notificationService: NotificationService,
+    private store: Store
   ) {}
 
   @Selector()
@@ -52,15 +55,32 @@ export class GeneratorState {
   }
 
   @Action(GenerateItems)
-  generateItems(ctx: StateContext<GeneratorStateModel>, { prompt, title }: GenerateItems) {
+  generateItems(ctx: StateContext<GeneratorStateModel>, { prompt }: GenerateItems) {
     ctx.patchState({ loading: true, error: null });
-    return this.chatService.generateResponse(prompt).pipe(
+
+    let finalPrompt = `${prompt} Al inicio de cada pregunta, genera un título corto y descriptivo de máximo 5 palabras, seguido del separador '|||TITLE|||' y luego el contenido de la pregunta.`;
+
+    finalPrompt += ` IMPORTANTE: Para las preguntas de selección múltiple, formatea cada opción (a, b, c, etc.) en una línea nueva. Al final de todas las opciones, indica la respuesta correcta en una nueva línea separada, por ejemplo: 'Respuesta correcta: c)'.`;
+
+    return this.chatService.generateResponse(finalPrompt).pipe(
       tap((response) => {
-        const newItem: Item = {
-          content: response.response,
-          createdDate: new Date().toLocaleDateString('es-CO'),
-        };
-        ctx.dispatch(new GenerateItemsSuccess(newItem));
+        const responseParts = response.response.split('---###---');
+        const newItems: Item[] = responseParts
+          .map(part => part.trim())
+          .filter(part => part.length > 0)
+          .map((part, index) => {
+            const [title, content] = part.split('|||TITLE|||');
+            return {
+              tempId: `item-${Date.now()}-${index}`,
+              title: content ? title.trim() : 'Pregunta Generada',
+              content: content ? content.trim() : title.trim(),
+              createdDate: new Date().toLocaleDateString('es-CO'),
+              isSaved: false,
+              isCollapsed: false,
+            };
+          });
+        
+        ctx.dispatch(new AddGeneratedItems(newItems));
       }),
       catchError((error) => {
         const errorMessage = error.error?.message || 'Error al comunicarse con la IA.';
@@ -70,64 +90,89 @@ export class GeneratorState {
     );
   }
 
-  @Action(GenerateItemsSuccess)
-  generateItemsSuccess(ctx: StateContext<GeneratorStateModel>, { newItem }: GenerateItemsSuccess) {
+  @Action(AddGeneratedItems)
+  addGeneratedItems(ctx: StateContext<GeneratorStateModel>, { items }: AddGeneratedItems) {
     const state = ctx.getState();
     ctx.patchState({
-      generatedItems: [newItem, ...state.generatedItems],
+      generatedItems: [...items, ...state.generatedItems],
       loading: false,
     });
+  }
+  
+  @Action(ClearGeneratedItems)
+  clearGeneratedItems(ctx: StateContext<GeneratorStateModel>) {
+    ctx.patchState({ generatedItems: [] });
   }
 
   @Action(GenerateItemsFailure)
   generateItemsFailure(ctx: StateContext<GeneratorStateModel>, { error }: GenerateItemsFailure) {
-    ctx.patchState({
-      loading: false,
-      error: error,
-    });
+    ctx.patchState({ loading: false, error: error });
   }
 
   @Action(SaveAnswer)
   saveAnswer(ctx: StateContext<GeneratorStateModel>, { payload }: SaveAnswer) {
     const state = this.store.snapshot();
     const allUsers = state.user.allUsers;
-
     if (!allUsers || allUsers.length === 0) {
       return ctx.dispatch(new LoadUsers()).pipe(
         switchMap(() => this.performSave(ctx, payload))
       );
     }
-
     return this.performSave(ctx, payload);
   }
 
-  private performSave(ctx: StateContext<GeneratorStateModel>, payload: { content: string }) {
+  private performSave(ctx: StateContext<GeneratorStateModel>, payload: { content: string; tempId: string; }) {
     const authUser = this.store.selectSnapshot(AuthState.user);
     if (!authUser) {
       return ctx.dispatch(new SaveAnswerFailure('No hay un usuario autenticado.'));
     }
     const allUsers = this.store.snapshot().user.allUsers;
     const fullCurrentUser = allUsers.find((user: User) => user.email === authUser.email);
-
     if (!fullCurrentUser || !fullCurrentUser.id) {
-      const errorMsg = 'No se pudo encontrar el ID del usuario en la lista de usuarios cargados.';
+      const errorMsg = 'No se pudo encontrar el ID del usuario.';
       return ctx.dispatch(new SaveAnswerFailure(errorMsg));
     }
-
     const apiPayload: AnswerPayload = {
       content: payload.content,
       role: fullCurrentUser.role,
       userId: fullCurrentUser.id
     };
-
     return this.answerService.saveAnswer(apiPayload).pipe(
       tap((savedAnswer: Document) => {
+        ctx.dispatch(new SaveAnswerSuccess(savedAnswer, payload.tempId));
         ctx.dispatch(new AddDocument(savedAnswer));
-        ctx.dispatch(new SaveAnswerSuccess(savedAnswer));
       }),
       catchError(error => {
+        this.notificationService.show('Error al guardar la pregunta', 'is-danger');
         return ctx.dispatch(new SaveAnswerFailure(error));
       })
     );
+  }
+
+  @Action(SaveAnswerSuccess)
+  saveAnswerSuccess(ctx: StateContext<GeneratorStateModel>, { tempId }: SaveAnswerSuccess) {
+    const state = ctx.getState();
+    const updatedItems = state.generatedItems.map(item => 
+      item.tempId === tempId ? { ...item, isSaved: true } : item
+    );
+    ctx.patchState({ generatedItems: updatedItems });
+    this.notificationService.show('Pregunta guardada con éxito');
+  }
+
+  @Action(ToggleItemCollapse)
+  toggleItemCollapse(ctx: StateContext<GeneratorStateModel>, { tempId }: ToggleItemCollapse) {
+    const state = ctx.getState();
+    const updatedItems = state.generatedItems.map(item => {
+      if (item.tempId === tempId) {
+        return {
+          ...item,
+          isCollapsed: !item.isCollapsed
+        };
+      }
+      return item;
+    });
+    ctx.patchState({
+      generatedItems: updatedItems
+    });
   }
 }

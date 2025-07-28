@@ -133,8 +133,8 @@
           <div class="field">
             <div class="control">
               <button type="submit" class="button is-primary is-fullwidth" 
-                      [disabled]="generatorForm.invalid || isLoadingResponse"
-                      [ngClass]="{'is-loading': isLoadingResponse}">
+                      [disabled]="generatorForm.invalid || (isLoadingResponse$ | async)"
+                      [ngClass]="{'is-loading': isLoadingResponse$ | async}">
                 Generar
               </button>
             </div>
@@ -143,8 +143,7 @@
       </div>
     </form>
   </div>
-  <!-- El componente de items ahora recibe la lista de items generados -->
   <div class="column">
-    <app-items [items]="generatedItems"></app-items>
+    <app-items [items]="(generatedItems$ | async) || []"></app-items>
   </div>
 </div>

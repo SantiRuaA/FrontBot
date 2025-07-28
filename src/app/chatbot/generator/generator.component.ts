@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, map, startWith, withLatestFrom, shareReplay, take } from 'rxjs';
+import { Observable, map, withLatestFrom } from 'rxjs';
+import { Store } from '@ngxs/store';
 import { Norm } from '../../shared/models/norm.model';
-import { NormService } from '../../core/services/norm.service';
-import { ChatService } from '../../core/services/chat.service';
 import { ItemsComponent, Item } from '../items/items.component';
 import { headerGeneratorComponent } from '../header-generator/header-generator.component';
+import { GeneratorState } from '../../state/generator/generator.state';
+import { GenerateItems } from '../../state/generator/generator.actions';
+import { NormState } from '../../state/norm/norm.state';
+import { LoadNorms } from '../../state/norm/norm.actions';
 
 @Component({
   selector: 'app-generator',
@@ -19,9 +22,11 @@ export class GeneratorComponent implements OnInit {
   generatorForm!: FormGroup;
 
   norms$!: Observable<Norm[]>;
+  generatedItems$!: Observable<Item[]>;
+  isLoadingResponse$!: Observable<boolean>;
   performanceCriteria$!: Observable<string[]>;
   knowledgeItems$!: Observable<string[]>;
-
+  
   categorias = ['Recordar', 'Comprender', 'Aplicar'];
   generarOpciones = ['1', '2'];
   formatos = [
@@ -31,14 +36,10 @@ export class GeneratorComponent implements OnInit {
     '(union de respuestas) varias preguntas y varias respuestas para unir los items',
   ];
   limites = ['50 palabras', '100 palabras', '200 palabras'];
-  
-  generatedItems: Item[] = [];
-  isLoadingResponse = false; 
 
   constructor(
     private fb: FormBuilder,
-    private normService: NormService,
-    private chatService: ChatService
+    private store: Store
   ) {}
 
   ngOnInit(): void {
@@ -54,13 +55,17 @@ export class GeneratorComponent implements OnInit {
       limite: [null, Validators.required]
     });
 
-    this.norms$ = this.normService.getNorms().pipe(
-      shareReplay(1)
-    );
+    this.norms$ = this.store.select(NormState.norms);
+    this.generatedItems$ = this.store.select(GeneratorState.generatedItems);
+    this.isLoadingResponse$ = this.store.select(GeneratorState.isLoading);
 
-    const normaChanges$ = this.generatorForm.get('norma')!.valueChanges.pipe(
-      startWith(null)
-    );
+    this.store.select(NormState.norms).subscribe(norms => {
+      if (norms.length === 0) {
+        this.store.dispatch(new LoadNorms());
+      }
+    });
+
+    const normaChanges$ = this.generatorForm.get('norma')!.valueChanges;
 
     this.performanceCriteria$ = normaChanges$.pipe(
       withLatestFrom(this.norms$),
@@ -87,36 +92,16 @@ export class GeneratorComponent implements OnInit {
       return;
     }
 
-    this.isLoadingResponse = true;
     const formValue = this.generatorForm.value;
+    const selectedNorm = this.store.selectSnapshot(NormState.norms).find(n => n._id === formValue.norma);
+    const normaNombre = selectedNorm ? selectedNorm.normaCertificacion : '';
 
-    this.norms$.pipe(
-      take(1) 
-    ).subscribe(norms => {
-      const selectedNorm = norms.find(n => n._id === formValue.norma);
-      const normaNombre = selectedNorm ? selectedNorm.normaCertificacion : '';
-
-      let prompt = `Necesito por favor que generes ${formValue.generar} pregunta(s), con el formato de pregunta estilo: ${formValue.formato}, utilizando esta información a continuación; norma: ${normaNombre}, con este criterio: ${formValue.criterioDesempeno}, tipo de conocimiento: ${formValue.conocimiento}, usando este contexto: ${formValue.contexto}, en este reactivo: ${formValue.reactivo}, limitando el texto de la pregunta a solo: ${formValue.limite}, con su respectiva respuesta correcta. Responde solo lo que te pido, no necesito ninguna otra información. Gracias.`;
-
-      if (parseInt(formValue.generar, 10) > 1) {
-        prompt += ` IMPORTANTE: Separa cada una de las preguntas generadas usando el siguiente texto exacto como separador: ---###---`;
-      }
-
-      this.chatService.generateResponse(prompt).subscribe({
-        next: (response) => {
-          const responseParts = response.response.split('---###---');
-          const newItems: Item[] = responseParts.map(part => ({
-            content: part.trim(),
-            createdDate: new Date().toLocaleDateString('es-CO')
-          }));
-          this.generatedItems = [...newItems, ...this.generatedItems];
-          this.isLoadingResponse = false;
-        },
-        error: (err) => {
-          console.error('Error al generar la respuesta:', err);
-          this.isLoadingResponse = false;
-        }
-      });
-    });
+    let prompt = `Necesito por favor que generes ${formValue.generar} pregunta(s), con el formato de pregunta estilo: ${formValue.formato}, utilizando esta información a continuación; norma: ${normaNombre}, con este criterio: ${formValue.criterioDesempeno}, tipo de conocimiento: ${formValue.conocimiento}, usando este contexto: ${formValue.contexto}, en este reactivo: ${formValue.reactivo}, limitando el texto de la pregunta a solo: ${formValue.limite}, con su respectiva respuesta correcta. Responde solo lo que te pido, no necesito ninguna otra información. Gracias.`;
+      
+    if (parseInt(formValue.generar, 10) > 1) {
+      prompt += ` IMPORTANTE: Separa cada una de las preguntas generadas usando el siguiente texto exacto como separador: ---###---`;
+    }
+    
+    this.store.dispatch(new GenerateItems(prompt));
   }
 }

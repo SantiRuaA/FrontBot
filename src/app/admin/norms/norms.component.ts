@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { Norm } from '../../shared/models/norm.model';
 import { NormState } from '../../state/norm/norm.state';
 import { LoadNorms, CreateNorm } from '../../state/norm/norm.actions';
 import { RouterLink } from '@angular/router';
+import { headerGeneratorComponent } from '../../chatbot/header-generator/header-generator.component';
+import { AuthState } from '../../state/auth/auth.state';
 
 @Component({
   selector: 'app-norms',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, headerGeneratorComponent],
   templateUrl: './norms.component.html',
 })
 export class NormsComponent implements OnInit {
@@ -19,6 +21,7 @@ export class NormsComponent implements OnInit {
   norms$!: Observable<Norm[]>;
   loading$!: Observable<boolean>;
   normForm!: FormGroup;
+  public isAdmin$: Observable<boolean>;
 
   constructor(
     private store: Store,
@@ -26,6 +29,10 @@ export class NormsComponent implements OnInit {
   ) {
     this.norms$ = this.store.select(NormState.norms);
     this.loading$ = this.store.select(NormState.loading);
+
+    this.isAdmin$ = this.store.select(AuthState.user).pipe(
+          map(user => user?.role?.toLowerCase() === 'administrador')
+    );
   }
 
   ngOnInit(): void {
