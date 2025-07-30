@@ -15,6 +15,7 @@ import { AuthState } from '../../state/auth/auth.state';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, headerGeneratorComponent],
   templateUrl: './norms.component.html',
+  styleUrls: ['./norms.component.css']
 })
 export class NormsComponent implements OnInit {
   

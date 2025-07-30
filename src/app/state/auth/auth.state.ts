@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../shared/models/user.model';
 import { Login, LoginSuccess, LoginFailure, Logout, RestoreSession, UpdateAuthenticatedUser } from './auth.actions';
+import { UserState } from '../user/user.state';
 import { LoadUsers, LoadUsersSuccess } from '../user/user.actions';
 
 export interface AuthStateModel {
@@ -60,7 +61,7 @@ export class AuthState {
           role: response.user.rol_asignado,
           fullName: 'Cargando...',
           department: '',
-          status: true,
+          status: true, // Se asume activo temporalmente
           image: 'assets/logosena.png',
         };
         ctx.dispatch(new LoginSuccess(userForState, token));
@@ -96,6 +97,11 @@ export class AuthState {
       const fullUser = allUsers.find((u: User) => u.email === user.email);
 
       if (fullUser) {
+        if (!fullUser.status) {
+          ctx.dispatch(new LoginFailure('Tu cuenta está inactiva.'));
+          ctx.dispatch(new Logout());
+          return;
+        }
         ctx.dispatch(new UpdateAuthenticatedUser(fullUser));
       }
     });
@@ -132,17 +138,31 @@ export class AuthState {
         try {
           const decodedToken: any = jwtDecode(token);
           if (Date.now() < decodedToken.exp * 1000) {
-            const userForState: User = {
+            const tempUser: User = {
               id: decodedToken.sub || decodedToken.id,
               tenantId: decodedToken.tenantId,
               email: decodedToken.email,
               role: decodedToken.role,
-              fullName: decodedToken.name || 'Usuario',
+              fullName: 'Cargando...',
               department: '',
               status: true,
               image: 'assets/logosena.png',
             };
-            ctx.patchState({ user: userForState, token, isAuthenticated: true });
+            ctx.patchState({ user: tempUser, token, isAuthenticated: true });
+
+            ctx.dispatch(new LoadUsers());
+
+            this.actions$.pipe(
+              ofActionSuccessful(LoadUsersSuccess),
+              take(1)
+            ).subscribe(() => {
+              const state = this.store.snapshot();
+              const allUsers = state.user.allUsers;
+              const fullUser = allUsers.find((u: User) => u.email === decodedToken.email);
+              if (fullUser) {
+                ctx.dispatch(new UpdateAuthenticatedUser(fullUser));
+              }
+            });
           } else {
             sessionStorage.removeItem('authToken');
           }

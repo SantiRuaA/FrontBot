@@ -16,6 +16,7 @@ import { LoadNorms } from '../../state/norm/norm.actions';
   standalone: true,
   imports: [ CommonModule, ReactiveFormsModule, headerGeneratorComponent, ItemsComponent, SlicePipe ],
   templateUrl: './generator.component.html',
+  styleUrls: ['./generator.component.css']
 })
 export class GeneratorComponent implements OnInit {
   

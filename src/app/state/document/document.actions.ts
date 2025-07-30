@@ -23,3 +23,13 @@ export class ChangeDocumentPage {
   static readonly type = '[Document] Change Document Page';
   constructor(public page: number) {}
 }
+
+export class ToggleDocumentSelection {
+  static readonly type = '[Document] Toggle Document Selection';
+  constructor(public documentId: string) {}
+}
+
+export class FilterDocuments {
+  static readonly type = '[Document] Filter Documents';
+  constructor(public filter: string) {}
+}

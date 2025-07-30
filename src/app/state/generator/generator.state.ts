@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, Selector, Store } from '@ngxs/store';
-import { tap, catchError, of, switchMap } from 'rxjs';
+import { State, Action, StateContext, Selector, Store, Actions, ofActionSuccessful } from '@ngxs/store';
+import { tap, catchError, of, switchMap, take } from 'rxjs';
 import { Item } from '../../chatbot/items/items.component';
 import { ChatService } from '../../core/services/chat.service';
 import { 
@@ -19,7 +19,7 @@ import { AuthState } from '../auth/auth.state';
 import { AddDocument } from '../document/document.actions';
 import { Document } from '../../shared/models/document.model';
 import { User } from '../../shared/models/user.model';
-import { LoadUsers } from '../user/user.actions';
+import { LoadUsers, LoadUsersSuccess } from '../user/user.actions';
 
 export interface GeneratorStateModel {
   generatedItems: Item[];
@@ -41,7 +41,8 @@ export class GeneratorState {
     private chatService: ChatService,
     private answerService: AnswerService,
     private notificationService: NotificationService,
-    private store: Store
+    private store: Store,
+    private actions$: Actions
   ) {}
 
   @Selector()
@@ -57,18 +58,14 @@ export class GeneratorState {
   @Action(GenerateItems)
   generateItems(ctx: StateContext<GeneratorStateModel>, { prompt }: GenerateItems) {
     ctx.patchState({ loading: true, error: null });
-
-    let finalPrompt = `${prompt} Al inicio de cada pregunta, genera un título corto y descriptivo de máximo 5 palabras, seguido del separador '|||TITLE|||' y luego el contenido de la pregunta.`;
-
-    finalPrompt += ` IMPORTANTE: Para las preguntas de selección múltiple, formatea cada opción (a, b, c, etc.) en una línea nueva. Al final de todas las opciones, indica la respuesta correcta en una nueva línea separada, por ejemplo: 'Respuesta correcta: c)'.`;
-
+    const finalPrompt = `${prompt} Al inicio de cada pregunta, genera un título corto y descriptivo de máximo 5 palabras, seguido del separador '|||TITLE|||' y luego el contenido de la pregunta. IMPORTANTE: Para las preguntas de selección múltiple, formatea cada opción (a, b, c, etc.) en una línea nueva. Al final de todas las opciones, indica la respuesta correcta en una nueva línea separada, por ejemplo: 'Respuesta correcta: c)'.`;
     return this.chatService.generateResponse(finalPrompt).pipe(
       tap((response) => {
         const responseParts = response.response.split('---###---');
         const newItems: Item[] = responseParts
           .map(part => part.trim())
           .filter(part => part.length > 0)
-          .map((part, index) => {
+          .map((part: string, index: number) => {
             const [title, content] = part.split('|||TITLE|||');
             return {
               tempId: `item-${Date.now()}-${index}`,
@@ -79,7 +76,6 @@ export class GeneratorState {
               isCollapsed: false,
             };
           });
-        
         ctx.dispatch(new AddGeneratedItems(newItems));
       }),
       catchError((error) => {
@@ -115,13 +111,14 @@ export class GeneratorState {
     const allUsers = state.user.allUsers;
     if (!allUsers || allUsers.length === 0) {
       return ctx.dispatch(new LoadUsers()).pipe(
+        switchMap(() => this.actions$.pipe(ofActionSuccessful(LoadUsersSuccess), take(1))),
         switchMap(() => this.performSave(ctx, payload))
       );
     }
     return this.performSave(ctx, payload);
   }
 
-  private performSave(ctx: StateContext<GeneratorStateModel>, payload: { content: string; tempId: string; }) {
+  private performSave(ctx: StateContext<GeneratorStateModel>, payload: { content: string; tempId: string; title: string; }) {
     const authUser = this.store.selectSnapshot(AuthState.user);
     if (!authUser) {
       return ctx.dispatch(new SaveAnswerFailure('No hay un usuario autenticado.'));
@@ -132,15 +129,25 @@ export class GeneratorState {
       const errorMsg = 'No se pudo encontrar el ID del usuario.';
       return ctx.dispatch(new SaveAnswerFailure(errorMsg));
     }
+    
+    const fullContentToSave = `${payload.title} |||TITLE||| ${payload.content}`;
+
     const apiPayload: AnswerPayload = {
-      content: payload.content,
+      content: fullContentToSave,
+      title: payload.title,
       role: fullCurrentUser.role,
       userId: fullCurrentUser.id
     };
+
     return this.answerService.saveAnswer(apiPayload).pipe(
-      tap((savedAnswer: Document) => {
-        ctx.dispatch(new SaveAnswerSuccess(savedAnswer, payload.tempId));
-        ctx.dispatch(new AddDocument(savedAnswer));
+      tap((savedAnswerFromApi: Document) => {
+        const completeDocument: Document = {
+          ...savedAnswerFromApi,
+          content: fullContentToSave,
+          title: payload.title 
+        };
+        ctx.dispatch(new AddDocument(completeDocument));
+        ctx.dispatch(new SaveAnswerSuccess(completeDocument, payload.tempId));
       }),
       catchError(error => {
         this.notificationService.show('Error al guardar la pregunta', 'is-danger');
@@ -150,10 +157,10 @@ export class GeneratorState {
   }
 
   @Action(SaveAnswerSuccess)
-  saveAnswerSuccess(ctx: StateContext<GeneratorStateModel>, { tempId }: SaveAnswerSuccess) {
+  saveAnswerSuccess(ctx: StateContext<GeneratorStateModel>, { savedAnswer, tempId }: SaveAnswerSuccess) {
     const state = ctx.getState();
     const updatedItems = state.generatedItems.map(item => 
-      item.tempId === tempId ? { ...item, isSaved: true } : item
+      item.tempId === tempId ? { ...item, isSaved: true, title: savedAnswer.title } : item
     );
     ctx.patchState({ generatedItems: updatedItems });
     this.notificationService.show('Pregunta guardada con éxito');
@@ -164,15 +171,10 @@ export class GeneratorState {
     const state = ctx.getState();
     const updatedItems = state.generatedItems.map(item => {
       if (item.tempId === tempId) {
-        return {
-          ...item,
-          isCollapsed: !item.isCollapsed
-        };
+        return { ...item, isCollapsed: !item.isCollapsed };
       }
       return item;
     });
-    ctx.patchState({
-      generatedItems: updatedItems
-    });
+    ctx.patchState({ generatedItems: updatedItems });
   }
 }

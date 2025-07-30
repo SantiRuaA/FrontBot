@@ -42,13 +42,11 @@ export interface UserStateModel {
 export class UserState {
   constructor(private userService: UserService) {}
 
-  // --- SELECTORES ---
 
   @Selector()
   static getVisibleUsers(state: UserStateModel): User[] {
     const { allUsers, filter, page, limit } = state;
 
-    // 1. Filtra la lista completa
     const filtered = !filter
       ? allUsers
       : allUsers.filter(user => {

@@ -112,15 +112,9 @@
             <div class="level-right">
               <div class="level-item">
                 <div class="buttons">
-                  <button [routerLink]="['/normas', norm._id]" type="button" class="button is-link is-small">
-                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
-                    <span>Ver</span>
-                  </button>
-                  <button *ngIf="isAdmin$ | async" [routerLink]="['/normas', norm._id, 'edit']" class="button is-link is-small">
-                    <span class="icon"><i class="fas fa-edit"></i></span>
-                    <span>Editar</span>
-                  </button>
-                  <button *ngIf="isAdmin$ | async" type="button" class="button is-danger is-small">
+                  <a [routerLink]="['/normas', norm._id]" class="button is-small action-button mr-2">Ver</a>
+                  <a [routerLink]="['/normas', norm._id, 'edit']" class="button is-small action-button">Editar</a>
+                  <button type="button" class="button is-danger is-small">
                     <span class="icon is-small"><i class="fas fa-trash-alt"></i></span>
                     <span>Eliminar</span>
                   </button>

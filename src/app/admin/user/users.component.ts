@@ -12,6 +12,7 @@ import { ChangeUserPage, FilterUsers, LoadUsers } from '../../state/user/user.ac
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './users.component.html',
+  styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
   users$: Observable<User[]>;

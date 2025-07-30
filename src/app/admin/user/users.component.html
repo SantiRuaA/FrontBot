@@ -8,62 +8,62 @@
         <div class="level-right">
             <div class="level-item">
                 <a routerLink="/register" class="button is-primary">
-                    <span class="icon">
-                        <i class="fas fa-plus"></i>
-                    </span>
+                    <span class="icon"><i class="fas fa-plus"></i></span>
                     <span>Nuevo Usuario</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="field mb-5">
-      <label class="label">Buscar Usuario</label>
-      <div class="control has-icons-left">
-        <input class="input" type="text" placeholder="Buscar por nombre, correo o rol..." (keyup)="applyFilter($event)">
-        <span class="icon is-left">
-          <i class="fas fa-search"></i>
-        </span>
-      </div>
+    <div *ngIf="error$ | async as error" class="notification is-danger is-light mb-4">
+      <strong>Error:</strong> {{ error }}
     </div>
 
-    <div class="box is-shadow-1 is-rounded overflow-hidden">
+    <div class="field mb-5">
+        <label class="label">Buscar Usuario</label>
+        <div class="control has-icons-left">
+            <input class="input" type="text" placeholder="Buscar por nombre, correo o rol..." (keyup)="applyFilter($event)">
+            <span class="icon is-left"><i class="fas fa-search"></i></span>
+        </div>
+    </div>
+
+    <div class="box is-shadow-none p-0">
         <div class="table-container">
             <table class="table is-fullwidth is-hoverable">
                 <thead>
                     <tr>
-                        <th class="has-text-left has-text-weight-semibold has-text-grey-light is-uppercase tracking-wider">Usuario</th>
-                        <th class="has-text-left has-text-weight-semibold has-text-grey-light is-uppercase tracking-wider">Email</th>
-                        <th class="has-text-left has-text-weight-semibold has-text-grey-light is-uppercase tracking-wider">Rol</th>
-                        <th class="has-text-left has-text-weight-semibold has-text-grey-light is-uppercase tracking-wider">Status</th>
-                        <th class="has-text-right has-text-weight-semibold has-text-grey-light is-uppercase tracking-wider">
-                            <span class="sr-only">Acciones</span>
-                        </th>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Status</th>
+                        <th class="has-text-right">Acciones</th>
                     </tr>
                 </thead>
-                <tbody *ngIf="users$ | async as users; else loading">
-                    <tr *ngIf="users.length === 0">
-                        <td colspan="5" class="has-text-centered">No se encontraron usuarios con ese filtro.</td>
+                <tbody *ngIf="!(loading$ | async); else loadingTemplate">
+                    <tr *ngIf="(users$ | async)?.length === 0">
+                        <td colspan="5" class="has-text-centered">No se encontraron usuarios.</td>
                     </tr>
-                    <tr *ngFor="let user of users">
+                    <tr *ngFor="let user of (users$ | async)">
                         <td>
                             <div class="media is-align-items-center">
                                 <div class="media-left">
                                     <figure class="image is-48x48">
-                                        <img [src]="user.image" alt="foto" class="is-rounded object-cover">
+                                        <img [src]="user.image" alt="foto" class="is-rounded">
                                     </figure>
                                 </div>
                                 <div class="media-content">
-                                    <p class="title is-6 has-text-grey-darker mb-1">{{ user.fullName }}</p>
+                                    <p class="title is-6 mb-1">{{ user.fullName }}</p>
                                     <p class="subtitle is-7 has-text-grey">{{ user.department }}</p>
                                 </div>
                             </div>
                         </td>
+                        <td>{{ user.email }}</td>
                         <td>
-                            <p class="has-text-grey-darker">{{ user.email }}</p>
-                        </td>
-                        <td>
-                            <span class="tag" [ngClass]="{'is-info': user.role.toLowerCase() === 'administrador', 'is-light': user.role.toLowerCase() !== 'administrador'}">
+                            <span class="tag" [ngClass]="{
+                                'is-info': user.role.toLowerCase() === 'administrador', 
+                                'role-evaluador': user.role.toLowerCase() === 'evaluador', 
+                                'role-dinamizador': user.role.toLowerCase() === 'dinamizador'
+                            }">
                                 {{ user.role }}
                             </span>
                         </td>
@@ -73,14 +73,8 @@
                             </span>
                         </td>
                         <td class="has-text-right">
-                            <button [routerLink]="['/usuarios', user.id]" type="button" class="button is-link is-small">
-                                <span class="icon is-small"><i class="fas fa-eye"></i></span>
-                                <span>Ver</span>
-                            </button>
-                            <button [routerLink]="['/usuarios', user.id, 'edit']" class="button is-link is-small">
-                                <span class="icon"><i class="fas fa-edit"></i></span>
-                                <span>Editar</span>
-                            </button>
+                            <a [routerLink]="['/usuarios', user.id]" class="button is-small action-button mr-2">Ver</a>
+                            <a [routerLink]="['/usuarios', user.id, 'edit']" class="button is-small action-button">Editar</a>
                         </td>
                     </tr>
                 </tbody>
@@ -88,10 +82,10 @@
         </div>
     </div>
     
-    <ng-container *ngIf="{ 
+    <ng-container *ngIf="{
         total: total$ | async, 
         limit: limit$ | async, 
-        currentPage: currentPage$ | async 
+        currentPage: currentPage$ | async
       } as pagination">
     
       <nav class="pagination is-centered mt-4" role="navigation" *ngIf="pagination.total! > pagination.limit!">
@@ -115,11 +109,11 @@
     </ng-container>
 </div>
 
-<ng-template #loading>
+<ng-template #loadingTemplate>
     <tbody>
         <tr>
             <td colspan="5" class="has-text-centered py-5">
-                <button class="button is-loading is-ghost">Cargando usuarios...</button>
+                <button class="button is-loading is-ghost is-large">Cargando usuarios...</button>
             </td>
         </tr>
     </tbody>

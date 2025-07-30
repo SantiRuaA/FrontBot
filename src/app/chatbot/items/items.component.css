@@ -1,0 +1,33 @@
+.placeholder-notification {
+  background-color: rgba(57, 169, 0, 0.1);
+  color: rgb(30, 90, 0); 
+  border-left: 4px solid rgb(57, 169, 0);
+  box-shadow: 0 4px 12px rgba(57, 169, 0, 0.2);
+}
+
+.card.animate__animated {
+  --animate-duration: 0.5s;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.status-indicator {
+  position: absolute;
+  top: 10px;
+  right: -50px;
+  transform: rotate(45deg);
+  padding: 5px 50px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1);
+  z-index: 1;
+}
+
+.status-indicator.is-saved {
+  background-color: hsl(141, 71%, 48%);
+}

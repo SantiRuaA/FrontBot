@@ -1,0 +1,15 @@
+.action-button {
+  background-color: #e9f5e6; 
+  color: #318f00; 
+  border-color: #d4edd0;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.action-button:hover {
+  background-color: #d4edd0;
+  color: #2b7a00;
+  border-color: #bce3b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}

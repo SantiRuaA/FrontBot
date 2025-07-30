@@ -21,7 +21,7 @@ export class ClearGeneratedItems {
 
 export class SaveAnswer {
   static readonly type = '[Generator] Save Answer';
-  constructor(public payload: { content: string; tempId: string; }) {}
+  constructor(public payload: { content: string; tempId: string; title: string; }) {}
 }
 
 export class SaveAnswerSuccess {

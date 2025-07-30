@@ -6,7 +6,7 @@ body {
 
 .card {
   position: relative;
-  overflow: hidden; /* Para que el indicador no se salga */
+  overflow: hidden;
 }
 
 .card.animate__animated {
@@ -28,11 +28,11 @@ body {
 }
 
 .status-indicator.is-saved {
-  background-color: rgb(57, 169, 0); /* Verde de Bulma */
+  background-color: rgb(57, 169, 0);
 }
 
 .status-indicator.is-not-saved {
-  background-color: hsl(348, 100%, 61%); /* Rojo de Bulma */
+  background-color: hsl(348, 100%, 61%); 
 }
 
 .status-indicator::before {
@@ -63,4 +63,16 @@ body {
 .tabs li.is-active a {
   border-bottom-color: rgb(57, 169, 0);
   color: rgb(57, 169, 0);
+}
+
+::selection {
+  background-color: rgba(57, 169, 0, 0.3);
+  color: #000; 
+}
+
+.input:focus,
+.textarea:focus,
+.select select:focus {
+  border-color: rgb(57, 169, 0);
+  box-shadow: 0 0 0 0.125em rgba(57, 169, 0, 0.25);
 }

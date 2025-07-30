@@ -1,0 +1,4 @@
+:host ::ng-deep .tabs.is-centered li.is-active a {
+  border-bottom-color: rgb(57, 169, 0);
+  color: rgb(57, 169, 0);
+}

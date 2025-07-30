@@ -1,0 +1,9 @@
+.items-container {
+  max-height: 1000px;
+  
+  overflow-y: auto;
+  
+  background-color: #fafafa;
+  padding: 1rem;
+  border-radius: 6px;
+}

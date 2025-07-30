@@ -1,20 +1,61 @@
-<div class="container is-fullhd box">
-  <h1 class="title">Items Guardados</h1>
-  <p class="subtitle">Aquí encontrarás todas las respuestas que has guardado desde el generador.</p>
-
+<div class="container is-max-desktop box">
   <ng-container *ngIf="view$ | async as view">
+    <div class="level is-mobile">
+      <div class="level-left">
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <button class="button is-primary is-medium" [disabled]="view.selectedCount === 0" (click)="downloadSelected()">
+            <span class="icon"><i class="fas fa-file-word"></i></span>
+            <span>Descargar ({{ view.selectedCount }})</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field mb-5">
+      <div class="control has-icons-left">
+        <input class="input" type="text" placeholder="Buscar por título o autor..." (keyup)="applyFilter($event)">
+        <span class="icon is-left">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+    </div>
+
     <ng-container *ngIf="!view.isLoading; else loadingTemplate">
       <div *ngIf="view.documents.length === 0" class="notification is-info is-light">
-        No hay items guardados todavía. Ve al generador para crear y guardar algunos.
+        No se encontraron items con ese criterio de búsqueda.
       </div>
 
-      <div *ngFor="let doc of view.documents" class="card mb-4">
-        <div class="card-content">
-          <div class="content" [innerHTML]="doc.content | nl2br"></div>
+      <div *ngFor="let doc of view.documents" class="card mb-4" [class.is-selected]="doc.isSelected">
+        
+        <header class="card-header is-clickable" (click)="toggleCollapse(doc._id)">
+          <p class="card-header-title">
+            {{ doc.title || 'Pregunta sin título' }}
+          </p>
+          <a class="card-header-icon" aria-label="expand">
+            <span class="icon">
+              <i class="fas" [class.fa-angle-down]="!isCollapsed(doc._id)" [class.fa-angle-up]="isCollapsed(doc._id)"></i>
+            </span>
+          </a>
+        </header>
+
+        <div class="card-content" *ngIf="!isCollapsed(doc._id)">
+          <div class="media">
+            <div class="media-left">
+              <div class="checkbox-container">
+                <input type="checkbox" [checked]="doc.isSelected" (change)="toggleSelection(doc)">
+              </div>
+            </div>
+            <div class="media-content">
+              <div class="content" [innerHTML]="doc.content | nl2br"></div>
+            </div>
+          </div>
         </div>
-        <footer class="card-footer">
+        
+        <footer class="card-footer" *ngIf="!isCollapsed(doc._id)">
           <p class="card-footer-item">
-            <span>Guardado por: <strong class="has-text-grey">{{ doc.role }}</strong></span>
+            <span>Guardado por: <strong class="has-text-grey">{{ doc.authorName }}</strong></span>
           </p>
           <p class="card-footer-item">
             <span>Fecha: <strong class="has-text-grey">{{ doc.createdAt | date:'short' }}</strong></span>
@@ -23,19 +64,19 @@
       </div>
 
       <nav class="pagination is-centered mt-4" role="navigation" *ngIf="view.total > view.limit">
-        <button class="pagination-previous" 
-                (click)="changePage(view.currentPage - 1)" 
-                [disabled]="view.currentPage === 1">
-            Anterior
+        <button class="pagination-previous" (click)="changePage(view.currentPage - 1)" [disabled]="view.currentPage === 1">
+          Anterior
         </button>
-        <button class="pagination-next" 
-                (click)="changePage(view.currentPage + 1)" 
-                [disabled]="view.currentPage * view.limit >= view.total">
-            Siguiente
+        <button class="pagination-next" (click)="changePage(view.currentPage + 1)" [disabled]="view.currentPage * view.limit >= view.total">
+          Siguiente
         </button>
         <ul class="pagination-list">
-            <li>
-                <a class="pagination-link is-current">{{ view.currentPage }}</a>
+            <li *ngFor="let page of view.pages">
+                <a class="pagination-link"
+                   [class.is-current]="page === view.currentPage"
+                   (click)="changePage(page)">
+                    {{ page }}
+                </a>
             </li>
         </ul>
       </nav>

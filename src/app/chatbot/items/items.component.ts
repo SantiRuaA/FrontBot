@@ -18,6 +18,7 @@ export interface Item {
   standalone: true,
   imports: [CommonModule, Nl2brPipe],
   templateUrl: './items.component.html',
+  styleUrls: ['./items.component.css']
 })
 export class ItemsComponent {
   @Input() items: Item[] = [];
@@ -26,7 +27,7 @@ export class ItemsComponent {
 
   onSave(item: Item): void {
     if (!item || item.isSaved) return;
-    this.store.dispatch(new SaveAnswer({ content: item.content, tempId: item.tempId }));
+    this.store.dispatch(new SaveAnswer({ content: item.content, tempId: item.tempId, title: item.title }));
   }
 
   toggleCollapse(item: Item): void {

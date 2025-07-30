@@ -6,6 +6,7 @@ export interface AnswerPayload {
   role: string;
   content: string;
   userId: string;
+  title: string;
 }
 
 @Injectable({
