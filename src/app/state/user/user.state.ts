@@ -58,7 +58,6 @@ export class UserState {
           );
         });
 
-    // 2. Pagina la lista filtrada
     const startIndex = (page - 1) * limit;
     return filtered.slice(startIndex, startIndex + limit);
   }
@@ -84,7 +83,6 @@ export class UserState {
   @Selector() static loading(state: UserStateModel): boolean { return state.loading; }
   @Selector() static error(state: UserStateModel): string | null { return state.error; }
 
-  // --- ACCIONES ---
 
   @Action(LoadUsers)
   loadUsers(ctx: StateContext<UserStateModel>) {

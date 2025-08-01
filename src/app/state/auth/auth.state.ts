@@ -8,8 +8,8 @@ import { jwtDecode } from 'jwt-decode';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../shared/models/user.model';
 import { Login, LoginSuccess, LoginFailure, Logout, RestoreSession, UpdateAuthenticatedUser } from './auth.actions';
-import { UserState } from '../user/user.state';
 import { LoadUsers, LoadUsersSuccess } from '../user/user.actions';
+import { RestoreGeneratedItems, ClearGeneratedItems } from '../generator/generator.actions';
 
 export interface AuthStateModel {
   user: User | null;
@@ -49,6 +49,11 @@ export class AuthState {
   @Action(Login)
   login(ctx: StateContext<AuthStateModel>, { correo_sena, password }: Login) {
     ctx.patchState({ loading: true, error: null });
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.removeItem('generatedItems');
+    }
+    ctx.dispatch(new ClearGeneratedItems());
+    
     return this.authService.login(correo_sena, password).pipe(
       tap((response: any) => {
         const token = response.accessToken;
@@ -61,7 +66,7 @@ export class AuthState {
           role: response.user.rol_asignado,
           fullName: 'Cargando...',
           department: '',
-          status: true, // Se asume activo temporalmente
+          status: true,
           image: 'assets/logosena.png',
         };
         ctx.dispatch(new LoginSuccess(userForState, token));
@@ -98,11 +103,15 @@ export class AuthState {
 
       if (fullUser) {
         if (!fullUser.status) {
-          ctx.dispatch(new LoginFailure('Tu cuenta está inactiva.'));
+          ctx.dispatch(new LoginFailure('Tu cuenta está inactiva. Por favor, contacta a un administrador.'));
           ctx.dispatch(new Logout());
           return;
         }
-        ctx.dispatch(new UpdateAuthenticatedUser(fullUser));
+        const userWithFirstName = {
+          ...fullUser,
+          fullName: fullUser.fullName.split(' ')[0]
+        };
+        ctx.dispatch(new UpdateAuthenticatedUser(userWithFirstName));
       }
     });
 
@@ -123,7 +132,10 @@ export class AuthState {
   logout(ctx: StateContext<AuthStateModel>) {
     if (isPlatformBrowser(this.platformId)) {
       sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('generatedItems');
     }
+    ctx.dispatch(new ClearGeneratedItems());
+    
     ctx.setState({
       user: null, token: null, isAuthenticated: false, error: null, loading: false, sessionRestored: false
     });
@@ -160,9 +172,16 @@ export class AuthState {
               const allUsers = state.user.allUsers;
               const fullUser = allUsers.find((u: User) => u.email === decodedToken.email);
               if (fullUser) {
-                ctx.dispatch(new UpdateAuthenticatedUser(fullUser));
+                const userWithFirstName = {
+                  ...fullUser,
+                  fullName: fullUser.fullName.split(' ')[0]
+                };
+                ctx.dispatch(new UpdateAuthenticatedUser(userWithFirstName));
               }
             });
+            
+            ctx.dispatch(new RestoreGeneratedItems());
+
           } else {
             sessionStorage.removeItem('authToken');
           }

@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { State, Action, StateContext, Selector, Store, Actions, ofActionSuccessful } from '@ngxs/store';
 import { tap, catchError, of, switchMap, take } from 'rxjs';
 import { Item } from '../../chatbot/items/items.component';
@@ -11,7 +12,8 @@ import {
   SaveAnswer,
   SaveAnswerSuccess,
   SaveAnswerFailure,
-  ToggleItemCollapse
+  ToggleItemCollapse,
+  RestoreGeneratedItems
 } from './generator.actions';
 import { NotificationService } from '../../core/services/notification.service';
 import { AnswerService, AnswerPayload } from '../../core/services/answer.service';
@@ -42,7 +44,8 @@ export class GeneratorState {
     private answerService: AnswerService,
     private notificationService: NotificationService,
     private store: Store,
-    private actions$: Actions
+    private actions$: Actions,
+    @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
   @Selector()
@@ -89,15 +92,37 @@ export class GeneratorState {
   @Action(AddGeneratedItems)
   addGeneratedItems(ctx: StateContext<GeneratorStateModel>, { items }: AddGeneratedItems) {
     const state = ctx.getState();
+    const newItems = [...items, ...state.generatedItems];
     ctx.patchState({
-      generatedItems: [...items, ...state.generatedItems],
+      generatedItems: newItems,
       loading: false,
     });
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.setItem('generatedItems', JSON.stringify(newItems));
+    }
   }
   
   @Action(ClearGeneratedItems)
   clearGeneratedItems(ctx: StateContext<GeneratorStateModel>) {
     ctx.patchState({ generatedItems: [] });
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.removeItem('generatedItems');
+    }
+  }
+
+  @Action(RestoreGeneratedItems)
+  restoreGeneratedItems(ctx: StateContext<GeneratorStateModel>) {
+    if (isPlatformBrowser(this.platformId)) {
+      const storedItems = sessionStorage.getItem('generatedItems');
+      if (storedItems) {
+        try {
+          const items: Item[] = JSON.parse(storedItems);
+          ctx.patchState({ generatedItems: items });
+        } catch (e) {
+          sessionStorage.removeItem('generatedItems');
+        }
+      }
+    }
   }
 
   @Action(GenerateItemsFailure)
@@ -131,7 +156,6 @@ export class GeneratorState {
     }
     
     const fullContentToSave = `${payload.title} |||TITLE||| ${payload.content}`;
-
     const apiPayload: AnswerPayload = {
       content: fullContentToSave,
       title: payload.title,

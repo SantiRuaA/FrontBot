@@ -34,6 +34,10 @@ export class SaveAnswerFailure {
   constructor(public error: any) {}
 }
 
+export class RestoreGeneratedItems {
+  static readonly type = '[Generator] Restore Generated Items';
+}
+
 export class ToggleItemCollapse {
   static readonly type = '[Generator] Toggle Item Collapse';
   constructor(public tempId: string) {}
